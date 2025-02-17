@@ -1,6 +1,7 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Route; // Mengimpor facade Route untuk mendefinisikan rute web
+use App\Http\Controllers\ItemController; // Mengimpor controller ItemController untuk menangani rute terkait item
 
 /*
 |--------------------------------------------------------------------------
@@ -14,5 +15,10 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
+    // Rute untuk halaman utama (root) yang menampilkan tampilan 'welcome'
     return view('welcome');
 });
+
+Route::resource('items', ItemController::class);
+// Mendefinisikan rute untuk resource 'items', yang otomatis menghubungkan berbagai 
+// metode HTTP dengan metode pada ItemController (index, create, store, show, edit, update, destroy)
