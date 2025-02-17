@@ -7,83 +7,68 @@ use Illuminate\Http\Request;
 
 class ItemController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    // menampilkan daftar item
     public function index()
     {
-        $items = Item::all(); // Mengambil semua data item dari model Item
-        return view('items.index', compact('item'));  // Mengembalikan tampilan 'items.index' dan mengirimkan data items
+        $items = Item::all(); // mengambil semua data item dari database
+        return view('items.index', compact('items')); // mengirim data item ke tampilan 'items.index'
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+    // menampilkan form untuk membuat item baru
     public function create()
     {
-        return view('items.create'); // Mengembalikan tampilan form untuk membuat item
+        return view('items.create'); // mengarahkan ke tampilan form pembuatan item
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    // menyimpan item baru ke dalam database
     public function store(Request $request)
     {
-        // Validasi data inputan dari pengguna
-        $request->validate([
-            'name' => 'required', // Kolom 'name' wajib diisi
-            'description' => 'required', // Kolom 'description' wajib diisi
+        $request->validate([ // memvalidasi data yang diterima
+            'name' => 'required', // nama item wajib diisi
+            'description' => 'required', // deskripsi item wajib diisi
         ]);
 
-        Item::create($request->only(['name', 'description'])); // Menyimpan data item yang valid ke dalam database
-        return redirect()->route('item.index')->with('success', 'Item added successfully.');  // Redirect ke halaman index dengan pesan sukses
+        // Item::create($request->all()); // sebelumnya, menyimpan semua data yang diterima
+        // return redirect()->route('items.index'); // mengarahkan kembali ke halaman daftar item
+
+        // hanya masukkan atribut yang diizinkan
+        Item::create($request->only(['name', 'description'])); // menyimpan data nama dan deskripsi item ke dalam database
+        return redirect()->route('items.index')->with('success', 'Item added successfully.'); // mengarahkan kembali dan menampilkan pesan sukses
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $item)
+    // menampilkan detail item tertentu
+    public function show(Item $item)
     {
-        // Mengembalikan tampilan 'item.show' dan mengirimkan data item
-        return view('item.show', compact('item')); // Parameter 'item' seharusnya adalah objek, bukan string
+        return view('items.show', compact('item')); // mengirim data item ke tampilan 'items.show'
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $item)
+    // menampilkan form untuk mengedit item
+    public function edit(Item $item)
     {
-        // Mengembalikan tampilan form edit dan mengirimkan data item yang ingin diedit
-        return view('items.edit', compact('item'));
+        return view('items.edit', compact('item')); // mengirim data item ke tampilan form edit
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $item)
+    // memperbarui data item di database
+    public function update(Request $request, Item $item)
     {
-        // Validasi data inputan dari pengguna
-        $request->validate([
-            'name' => 'required', // Kolom 'name' wajib diisi
-            'description' => 'required', // Kolom 'description' wajib diisi
-        ])
-        // Hanya masukkan atribut yang diizinkan
-        // Mengupdate data item yang ada dengan atribut yang diizinkan
-        $item->update($request->only(['name', 'description']));
+        $request->validate([ // memvalidasi data yang diterima
+            'name' => 'required', // nama item wajib diisi
+            'description' => 'required', // deskripsi item wajib diisi
+        ]);
 
-        // Redirect ke halaman index dengan pesan sukses
-        return redirect()->route('items.index')->with('success', 'Item updated successfully');
+        // $item->update($request->all()); // sebelumnya, memperbarui semua data yang diterima
+        // return redirect()->route('items.index'); // mengarahkan kembali ke halaman daftar item
+
+        // hanya masukkan atribut yang diizinkan
+        $item->update($request->only(['name', 'description'])); // memperbarui data nama dan deskripsi item
+        return redirect()->route('items.index')->with('success', 'Item updated successfully.'); // mengarahkan kembali dan menampilkan pesan sukses
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $item)
+    // menghapus item dari database
+    public function destroy(Item $item)
     {
-        // Menghapus item dari database
-        $item-> delete();
-        
-        // Redirect ke halaman index dengan pesan sukses
-        return redirect()-> route('items.index')->with('success', 'Item deleted successfully');
+        // return redirect()->route('items.index'); // sebelumnya, mengarahkan kembali tanpa menghapus item
+        $item->delete(); // menghapus item dari database
+        return redirect()->route('items.index')->with('success', 'Item deleted successfully.'); // mengarahkan kembali dan menampilkan pesan sukses
     }
 }
