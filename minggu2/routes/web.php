@@ -7,6 +7,7 @@ use App\Http\Controllers\PageController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\AboutController;
 use App\Http\Controllers\ArticleController;
+use App\Http\Controllers\PhotoController;
 
 /*
 |--------------------------------------------------------------------------
@@ -73,6 +74,8 @@ Route::get('/articless', [PageController::class,'articles']);
 Route::get('/', HomeController::class);
 Route::get('/about', AboutController::class);
 Route::get('/articless', ArticleController::class);
+
+Route::resource('photos', PhotoController::class);
 
 Route::resource('items', ItemController::class);
 // Mendefinisikan rute untuk resource 'items', yang otomatis menghubungkan berbagai 
