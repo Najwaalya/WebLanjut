@@ -2,6 +2,11 @@
 
 use Illuminate\Support\Facades\Route; // Mengimpor facade Route untuk mendefinisikan rute web
 use App\Http\Controllers\ItemController; // Mengimpor controller ItemController untuk menangani rute terkait item
+use App\Http\Controllers\WelcomeController;
+use App\Http\Controllers\PageController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\AboutController;
+use App\Http\Controllers\ArticleController;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,22 +19,24 @@ use App\Http\Controllers\ItemController; // Mengimpor controller ItemController 
 |
 */
 
+/*
 Route::get('/', function () {
     // Rute untuk halaman utama (root) yang menampilkan tampilan 'welcome'
     return view('welcome');
 });
+*/
 
-Route::get('/hello', function(){
+Route::get('/hello', function () {
     return 'Hello World';
-});
+});   
 
 Route::get('/world', function(){
     return 'World';
 }); 
 
-Route::get('/', function(){
-    return 'Selamat Datang';
-}); 
+//Route::get('/', function(){
+//  return 'Selamat Datang';
+//}); 
 
 Route::get('/about', function(){
     return 'NIM: 2341720230 <br> Nama: Najwa Alya Nurizzah';
@@ -50,6 +57,22 @@ Route::get('/articles/{id}', function($id){
 Route::get('/user/{name?}', function($name=null){
     return 'Nama saya '.$name;
 });
+
+Route::get('/user/{name?}', function($name=null){
+    return 'Nama saya '.$name;
+});
+
+Route::get('/hello', [WelcomeController::class,'hello']);
+
+/*
+Route::get('/', [PageController::class,'index']);
+Route::get('/about', [PageController::class,'about']);
+Route::get('/articless', [PageController::class,'articles']);
+*/
+
+Route::get('/', HomeController::class);
+Route::get('/about', AboutController::class);
+Route::get('/articless', ArticleController::class);
 
 Route::resource('items', ItemController::class);
 // Mendefinisikan rute untuk resource 'items', yang otomatis menghubungkan berbagai 
