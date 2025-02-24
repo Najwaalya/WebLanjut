@@ -79,9 +79,7 @@ Route::resource('photos', PhotoController::class);
 
 Route::resource('items', ItemController::class);
 
-Route::get('/greeting', function () {
-    return view('blog.hello', ['name' => 'Najwa']);
-});
+Route::get('/greeting', [WelcomeController::class, 'greeting']);
 
 
     
