@@ -78,5 +78,12 @@ Route::get('/articless', ArticleController::class);
 Route::resource('photos', PhotoController::class);
 
 Route::resource('items', ItemController::class);
+
+Route::get('/greeting', function () {
+    return view('blog.hello', ['name' => 'Najwa']);
+});
+
+
+    
 // Mendefinisikan rute untuk resource 'items', yang otomatis menghubungkan berbagai 
 // metode HTTP dengan metode pada ItemController (index, create, store, show, edit, update, destroy)
