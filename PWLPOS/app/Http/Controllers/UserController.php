@@ -14,7 +14,7 @@ class UserController extends Controller
         //return view('user', ['data' => $user]);
 
         $user = UserModel::with('level')->get();
-        dd($user);
+        return view('user', ['data' => $user]);
     } 
 
     public function tambah()
