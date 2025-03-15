@@ -20,6 +20,7 @@
             <input type="text" name="nama" class="form-control" value="{{ $user->nama }}" required>
         </div>
         <button type="submit" class="btn btn-success">Update</button>
+        <a href="{{ url ('/user') }}" class="btn btn-secondary">Kembali</a>
     </form>
 </div>
 @endsection
