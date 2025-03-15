@@ -315,6 +315,18 @@ return [
             'icon' => 'bi-tags',
             'topnav' => true,
         ],
+        [
+            'text' => 'User',
+            'url' => '/user',
+            'icon' => 'fas fa-users',
+            'topnav' => true,
+        ],
+        [
+            'text' => 'Barang',
+            'url' => '/barang',
+            'icon' => 'fas fa-box',
+            'topnav' => true,
+        ],
         // Sidebar items:
         [
             'type' => 'sidebar-menu-search',
@@ -336,6 +348,16 @@ return [
             'text' => 'Kategori', // add navbar manage kategori
             'url' => '/kategori',
             'icon' => 'bi-tags',
+        ],
+        [
+            'text' => 'User',
+            'url' => '/user',
+            'icon' => 'fas fa-users',
+        ],
+        [
+            'text' => 'Barang',
+            'url' => '/barang',
+            'icon' => 'fas fa-box',
         ],
         ['header' => 'account_settings'],
         [
