@@ -5,19 +5,22 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\UserModel;
 use Illuminate\Support\Facades\Hash;
+use App\DataTables\UserDataTable;
 
 class UserController extends Controller
 {
-    public function index()
+    public function index(UserDataTable $dataTable)
     {
         //$user = UserModel::all();
         //return view('user', ['data' => $user]);
 
-        $user = UserModel::with('level')->get();
+        /*$user = UserModel::with('level')->get();
         return view('user', ['data' => $user]);
+        */
+        return $dataTable->render('user.index');
     } 
 
-    public function tambah()
+    /*public function tambah()
     {
         return view('user_tambah');
     }
@@ -60,5 +63,61 @@ class UserController extends Controller
         $user->delete();
 
         return redirect('/user');
+    }
+    */
+
+    public function create()
+    {
+        return view('user.create');
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'level_id' => 'required|integer',
+            'username' => 'required|string|max:255',
+            'nama' => 'required|string|max:255',
+            'password' => 'required|min:6'
+        ]);
+        
+        UserModel::create([
+            'level_id' => $request->level_id,
+            'username' => $request->username,
+            'nama' => $request->nama,
+            'password' => Hash::make($request->password)
+        ]);
+
+        return redirect()->route('user.index')->with('success', 'User berhasil ditambahkan.');
+    }
+
+    public function edit($id)
+    {
+        $user = UserModel::findOrFail($id);
+        return view('user.edit', compact('user'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'level_id' => 'required|integer',
+            'username' => 'required|string|max:255',
+            'nama' => 'required|string|max:255',
+        ]);
+
+        $user = UserModel::findOrFail($id);
+        $user->update([
+            'level_id' => $request->level_id,
+            'username' => $request->username,
+            'nama' => $request->nama,
+        ]);
+
+        return redirect()->route('user.index')->with('success', 'User berhasil diperbarui.');
+    }
+
+    public function destroy($id)
+    {
+        $user = UserModel::findOrFail($id);
+        $user->delete();
+        return response()->json(['success' => 'User berhasil dihapus!']);
     }
 }
