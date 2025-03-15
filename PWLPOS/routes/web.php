@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LevelController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\BarangController;
 
 Route::get('/', function () {
     /*return view('welcome'); */
@@ -20,7 +21,7 @@ Route::put('/user/ubah_simpan/{id}', [UserController::class, 'ubah_simpan']);
 Route::get('/kategori', [KategoriController::class, 'index'])->name('kategori.index');
 Route::get('/kategori/create', [KategoriController::class, 'create'])->name('kategori.create');
 Route::get('/kategori/data', [KategoriController::class, 'data'])->name('kategori.data');
-Route::post('/kategori', [KategoriController::class, 'store']);
+Route::post('/kategori', [KategoriController::class, 'store'])->name('kategori.store');
 Route::get('/kategori/edit/{id}', [KategoriController::class, 'edit'])->name('kategori.edit');
 Route::put('/kategori/{id}', [KategoriController::class, 'update'])->name('kategori.update');
 Route::post('/kategori/delete/{id}', [KategoriController::class, 'destroy'])->name('kategori.destroy');
@@ -32,3 +33,11 @@ Route::post('/user', [UserController::class, 'store'])->name('user.store');
 Route::get('/user/edit/{id}', [UserController::class, 'edit'])->name('user.edit');
 Route::put('/user/{id}', [UserController::class, 'update'])->name('user.update');
 Route::post('/user/delete/{id}', [UserController::class, 'destroy'])->name('user.destroy');
+
+Route::get('/barang', [BarangController::class, 'index'])->name('barang.index'); 
+ Route::get('/barang/create', [BarangController::class, 'create'])->name('barang.create'); 
+ Route::get('/barang/data', [BarangController::class, 'data'])->name('barang.data');
+ Route::post('/barang', [BarangController::class, 'store'])->name('barang.store'); 
+ Route::get('/barang/edit/{id}', [BarangController::class, 'edit'])->name('barang.edit'); 
+ Route::put('/barang/{id}', [BarangController::class, 'update'])->name('barang.update'); 
+ Route::post('/barang/delete/{id}', [BarangController::class, 'destroy'])->name('barang.destroy'); 
