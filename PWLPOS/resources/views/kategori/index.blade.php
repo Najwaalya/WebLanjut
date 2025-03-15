@@ -12,13 +12,22 @@
              <div class="card-header d-flex justify-content-between align-items-center" >
                 <h5>Manage Kategori</h5>
             </div>
-             <div class="card-body">
+             <div class="card-body" >
                 <a href="{{ route('kategori.create') }}" class="btn btn-primary">+ Add</a>
                  {{ $dataTable->table() }}
              </div>
          </div>
      </div>
  @endsection
+
+ @push('styles')
+    <style>
+        .container {
+            max-height: 80vh; /* Sesuaikan tinggi agar footer tetap terlihat */
+            overflow-y: auto;
+        }
+    </style>
+@endpush
  
  @push('scripts')
      {{ $dataTable->scripts() }}

@@ -48,6 +48,8 @@
  {{-- Add common CSS customizations --}}
  @push('css')
      <link rel="stylesheet" href="https://cdn.datatables.net/2.0.2/css/dataTables.dataTables.css" />
+     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+      @stack('styles')
      <style type="text/css">
          {
                  {
