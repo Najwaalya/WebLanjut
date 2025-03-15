@@ -309,7 +309,6 @@ return [
             'type' => 'fullscreen-widget',
             'topnav_right' => true,
         ],
-
         // Sidebar items:
         [
             'type' => 'sidebar-menu-search',
@@ -326,6 +325,11 @@ return [
             'icon' => 'far fa-fw fa-file',
             'label' => 4,
             'label_color' => 'success',
+        ],
+        [
+            'text' => 'Kategori', // add navbar manage kategori
+            'url' => '/kategori',
+            'icon' => 'bi-tags',
         ],
         ['header' => 'account_settings'],
         [
