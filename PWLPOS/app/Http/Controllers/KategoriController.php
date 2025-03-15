@@ -41,6 +41,11 @@ class KategoriController extends Controller
             'kategori_kode' =>$request->kodeKategori,
             'kategori_nama' =>$request->namaKategori,
         ]);
-        return redirect('/ketagori');
+    }
+        
+    public function edit($id)
+    {
+        $kategori = KategoriModel::where('kategori_id', $id)->firstOrFail();
+        return view('kategori.edit', compact('kategori'));
     }
 }
