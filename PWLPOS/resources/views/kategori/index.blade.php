@@ -22,7 +22,7 @@
 
  @push('styles')
     <style>
-        .container {
+        .card-body {
             max-height: 80vh; /* Sesuaikan tinggi agar footer tetap terlihat */
             overflow-y: auto;
         }
