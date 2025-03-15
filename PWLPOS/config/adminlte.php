@@ -309,6 +309,12 @@ return [
             'type' => 'fullscreen-widget',
             'topnav_right' => true,
         ],
+        [
+            'text' => 'Kategori',
+            'url' => '/kategori',
+            'icon' => 'bi-tags',
+            'topnav' => true,
+        ],
         // Sidebar items:
         [
             'type' => 'sidebar-menu-search',
