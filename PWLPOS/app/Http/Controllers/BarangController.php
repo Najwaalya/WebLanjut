@@ -28,8 +28,6 @@ class BarangController extends Controller
             'harga_jual'   => 'required|numeric|min:0',
         ]);
 
-        dd($request->all());
-
         BarangModel::create([
             'kategori_id' => $request->kategori_id,
             'kode_barang' => $request->kode_barang,

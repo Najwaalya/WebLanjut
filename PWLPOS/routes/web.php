@@ -21,10 +21,10 @@ Route::put('/user/ubah_simpan/{id}', [UserController::class, 'ubah_simpan']);
 Route::get('/kategori', [KategoriController::class, 'index'])->name('kategori.index');
 Route::get('/kategori/create', [KategoriController::class, 'create'])->name('kategori.create');
 Route::get('/kategori/data', [KategoriController::class, 'data'])->name('kategori.data');
-Route::post('/kategori', [KategoriController::class, 'store'])->name('kategori.store');
-Route::get('/kategori/edit/{id}', [KategoriController::class, 'edit'])->name('kategori.edit');
-Route::put('/kategori/{id}', [KategoriController::class, 'update'])->name('kategori.update');
-Route::post('/kategori/delete/{id}', [KategoriController::class, 'destroy'])->name('kategori.destroy');
+Route::post('/kategori', [KategoriController::class, 'store'])->name('user.store');
+Route::get('/kategori/edit/{kategori_id}', [KategoriController::class, 'edit'])->name('kategori.edit');
+Route::put('/kategori/{kategori_id}', [KategoriController::class, 'update'])->name('kategori.update');
+Route::post('/kategori/delete/{kategori_id}', [KategoriController::class, 'destroy'])->name('kategori.destroy');
 
 Route::get('/user', [UserController::class, 'index'])->name('user.index');
 Route::get('/user/create', [UserController::class, 'create'])->name('user.create');

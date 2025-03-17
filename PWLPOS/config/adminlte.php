@@ -312,19 +312,16 @@ return [
         [
             'text' => 'Kategori',
             'url' => '/kategori',
-            'icon' => 'bi-tags',
             'topnav' => true,
         ],
         [
             'text' => 'User',
             'url' => '/user',
-            'icon' => 'fas fa-users',
             'topnav' => true,
         ],
         [
             'text' => 'Barang',
             'url' => '/barang',
-            'icon' => 'fas fa-box',
             'topnav' => true,
         ],
         // Sidebar items:

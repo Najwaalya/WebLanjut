@@ -8,7 +8,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class KategoriModel extends Model
 {
     protected $table = 'm_kategori';
-    protected $primarykey = 'kategori_id';
+    protected $primaryKey = 'kategori_id';
+    public $incrementing = true;
+    protected $keyType = 'int';
 
     protected $fillable = ['kategori_kode', 'kategori_nama'];
 

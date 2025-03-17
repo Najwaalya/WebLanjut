@@ -13,7 +13,7 @@
                 <h5>Manage Kategori</h5>
             </div>
              <div class="card-body" >
-                <a href="{{ route('kategori.create') }}" class="btn btn-primary">+ Add</a>
+             <a href="{{ url('kategori/create') }}" class="btn btn-primary btn-lg px-4 ml-auto">+ Add</a>
                  {{ $dataTable->table() }}
              </div>
          </div>

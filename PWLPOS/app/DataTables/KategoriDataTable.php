@@ -17,33 +17,33 @@
       *
       * @param QueryBuilder $query Results from query() method.
       */
-     public function dataTable(QueryBuilder $query): EloquentDataTable
-     {
+    public function dataTable(QueryBuilder $query): EloquentDataTable
+    {
         return (new EloquentDataTable($query))
         ->addColumn('action', function ($row) {
             $editUrl = url('/kategori/edit', $row->kategori_id);
-            $deleteUrl = url('/kategori/delete', $row->kategori_id);
-            $csrfToken = csrf_token();
+             $deleteUrl = url('/kategori/delete', $row->kategori_id);
+             $csrfToken = csrf_token();
  
-            return '
-            <div class="d-flex gap-2">
-                <a href="' . $editUrl . '" class="btn btn-warning btn-sm d-flex align-items-center px-3">
-                    Edit
-                </a>
-                <form action="' . $deleteUrl . '" method="POST" style="margin:0;">
-                    <input type="hidden" name="_method" value="POST">
-                    <input type="hidden" name="_token" value="' . $csrfToken . '">
-                    <button type="submit" class="btn btn-danger btn-sm d-flex align-items-center px-3"
-                        onclick="return confirm(\'Yakin ingin menghapus?\')">
-                        Delete
-                    </button>
-                </form>
-            </div>
-            ';
+             return '
+             <div class="d-flex gap-2">
+                 <a href="' . $editUrl . '" class="btn btn-warning btn-sm d-flex align-items-center px-3">
+                     Edit
+                 </a>
+                 <form action="' . $deleteUrl . '" method="POST" style="margin:0;">
+                     <input type="hidden" name="_method" value="POST">
+                     <input type="hidden" name="_token" value="' . $csrfToken . '">
+                     <button type="submit" class="btn btn-danger btn-sm d-flex align-items-center px-3"
+                         onclick="return confirm(\'Yakin ingin menghapus?\')">
+                         Delete
+                     </button>
+                 </form>
+             </div>
+             ';
         })
-        ->rawColumns(['action'])
-        ->setRowId('id');
-     }
+         ->rawColumns(['action'])
+         ->setRowId('kategori_id');
+        }
      /**
       * Get the query source of dataTable.
       */
