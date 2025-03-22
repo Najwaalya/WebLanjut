@@ -10,7 +10,7 @@
  
  class BarangController extends Controller
  {
-     public function index()
+    public function index()
      {
          $breadcrumb = (object) [
              'title' => 'Daftar Barang',
@@ -38,12 +38,10 @@
          return DataTables::of($barangs)
              ->addIndexColumn()
              ->addColumn('aksi', function ($barang) {
-                 $btn  = '<a href="' . url('/barang/' . $barang->barang_id) . '
-                 " class="btn btn-info btn-sm">Detail</a> ';
-                 $btn .= '<a href="' . url('/barang/' . $barang->barang_id . '/edit') . '
-                 " class="btn btn-warning btn-sm">Edit</a> ';
-                 $btn .= '<form class="d-inline-block" method="POST" action="' . url('/barang/' . $barang->barang_id) . '">'
-                     . csrf_field() . method_field('DELETE') .
+                 $btn  = '<a href="' . url('/barang/' . $barang->barang_id) . '" class="btn btn-info btn-sm">Detail</a> ';
+                 $btn .= '<a href="' . url('/barang/' . $barang->barang_id . '/edit') . '" class="btn btn-warning btn-sm">Edit</a> ';
+                 $btn .= '<form class="d-inline-block" method="POST" action="' . url('/barang/' . $barang->barang_id) . '">' .
+                     csrf_field() . method_field('DELETE') .
                      '<button type="submit" class="btn btn-danger btn-sm" onclick="return confirm(\'Apakah Anda yakin menghapus data ini?\');">Hapus</button></form>';
                  return $btn;
              })
@@ -77,16 +75,14 @@
      // Menyimpan data barang baru
      public function store(Request $request)
      {
-         // Validasi input
          $request->validate([
-             'kode_barang' => 'required|string|min:3|unique:m_barang', // Kode barang harus unik, minimal 3 karakter
-             'nama_barang' => 'required|string|max:100', // Nama barang harus diisi, berupa string, maksimal 100 karakter
-             'harga_beli' => 'required|numeric', // Harga beli harus berupa angka dan wajib diisi
-             'harga_jual' => 'required|numeric', // Harga jual harus berupa angka dan wajib diisi
-             'kategori_id' => 'required|integer' // Kategori harus diisi, berupa angka
+             'kode_barang' => 'required|string|min:3|unique:m_barang',
+             'nama_barang' => 'required|string|max:100',
+             'harga_beli' => 'required|numeric',
+             'harga_jual' => 'required|numeric',
+             'kategori_id' => 'required|integer'
          ]);
  
-         // Simpan data ke database
          BarangModel::create([
              'kode_barang' => $request->kode_barang,
              'nama_barang' => $request->nama_barang,
@@ -95,7 +91,6 @@
              'kategori_id' => $request->kategori_id
          ]);
  
-         // Redirect ke halaman barang dengan pesan sukses
          return redirect('/barang')->with('success', 'Data barang berhasil disimpan');
      }
  
@@ -158,19 +153,16 @@
      // Menyimpan perubahan data barang
      public function update(Request $request, string $id)
      {
-         // Validasi input dari request
          $request->validate([
-             'kode_barang' => 'required|string|min:3|unique:m_barang',
+             'kode_barang' => 'required|string|min:3|unique:m_barang,kode_barang,' . $id . ',barang_id',
              'nama_barang' => 'required|string|max:100',
              'harga_beli' => 'required|numeric',
              'harga_jual' => 'required|numeric',
              'kategori_id' => 'required|integer'
          ]);
  
-         // Ambil data barang berdasarkan ID
          $barang = BarangModel::findOrFail($id);
  
-         // Update data barang
          $barang->update([
              'kode_barang' => $request->kode_barang,
              'nama_barang' => $request->nama_barang,
@@ -179,7 +171,6 @@
              'kategori_id' => $request->kategori_id
          ]);
  
-         // Redirect kembali ke halaman barang dengan pesan sukses
          return redirect('/barang')->with('success', 'Data barang berhasil diubah');
      }
  
