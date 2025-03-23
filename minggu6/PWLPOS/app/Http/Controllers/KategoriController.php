@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\DB;
 use App\Models\KategoriModel;
 use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Support\Facades\Validator;
 
 use Illuminate\Http\Request;
 
@@ -29,6 +30,8 @@ class KategoriController extends Controller
         return view('kategori', ['data' => $data]);
         */
 
+        $kategori = KategoriModel::all();
+
         $breadcrumb = (object) [
             'title' => 'Daftar Kategori',
             'list'  => ['Home', 'Kategori']
@@ -39,7 +42,6 @@ class KategoriController extends Controller
         ];
 
         $activeMenu = 'kategori';
-
 
         return view('kategori.index', ['breadcrumb' => $breadcrumb, 'page' => $page, 'activeMenu' => $activeMenu]);
     }
@@ -94,6 +96,40 @@ class KategoriController extends Controller
  
          return redirect('/kategori')->with('success', 'Data kategori berhasil disimpan');
      }
+
+     public function create_ajax()
+    {
+        $kategori = KategoriModel::all();
+
+        return view('kategori.create_ajax', ['kategori' => $kategori]);
+    }
+
+    public function store_ajax(Request $request)
+    {
+        if ($request->ajax() || $request->wantsJson()) {
+            $rules = [
+                'kategori_kode' => 'required|string|max:6|regex:/^[A-Z0-9]+$/',
+                'kategori_nama' => 'required|string|min:3|max:50|regex:/^[a-zA-Z\s]+$/',
+            ];
+
+            $validator = Validator::make($request->all(), $rules);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'status'   => false,
+                    'message'  => 'Validasi Gagal',
+                    'msgField' => $validator->errors(),
+                ]);
+            }
+
+            KategoriModel::create($request->all());
+            return response()->json([
+                'status' => true,
+                'message' => 'Data Kategori berhasil disimpan'
+            ]);
+        }
+        redirect('/');
+    }
  
      public function show(string $id)
      {
@@ -112,6 +148,13 @@ class KategoriController extends Controller
  
          return view('kategori.show', ['breadcrumb' => $breadcrumb, 'page' => $page, 'kategori' => $kategori, 'activeMenu' => $activeMenu]);
      }
+
+     public function show_ajax(string $id)
+    {
+        $kategori = KategoriModel::find($id);
+
+        return view('kategori.show_ajax', ['kategori' => $kategori]);
+    }
  
      public function edit(string $id)
      {
@@ -130,6 +173,13 @@ class KategoriController extends Controller
  
          return view('kategori.edit', ['breadcrumb' => $breadcrumb, 'page' => $page, 'kategori' => $kategori, 'activeMenu' => $activeMenu]);
      }
+
+     public function edit_ajax(string $id)
+    {
+        $kategori = KategoriModel::find($id);
+
+        return view('kategori.edit_ajax', ['kategori' => $kategori]);
+    }
  
      public function update(Request $request, string $id)
      {
@@ -147,6 +197,41 @@ class KategoriController extends Controller
  
          return redirect('/kategori')->with('success', 'Data kategori berhasil diubah');
      }
+
+     public function update_ajax(Request $request, $id)
+    {
+        if ($request->ajax() || $request->wantsJson()) {
+            $rules = [
+                'kategori_kode' => 'required|string|max:6|regex:/^[A-Z0-9]+$/',
+                'kategori_nama' => 'required|string|min:3|max:50|regex:/^[a-zA-Z\s]+$/',
+            ];
+
+            $validator = Validator::make($request->all(), $rules);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'status'   => false,
+                    'message'  => 'Validasi gagal.',
+                    'msgField' => $validator->errors()
+                ]);
+            }
+
+            $check = kategoriModel::find($id);
+            if ($check) {
+                $check->update($request->all());
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Data berhasil diupdate'
+                ]);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Data tidak ditemukan'
+                ]);
+            }
+        }
+        return redirect('/');
+    }
  
      public function destroy(string $id)
      {
@@ -162,5 +247,40 @@ class KategoriController extends Controller
              return redirect('/kategori')->with('error', 'Data kategori gagal dihapus karena masih terdapat tabel lain yang terkait dengan data ini');
          }
      }
+
+     public function confirm_ajax(string $id)
+    {
+        $kategori = KategoriModel::find($id);
+
+        return view('kategori.confirm_ajax', ['kategori' => $kategori]);
+    }
+
+    public function delete_ajax(Request $request, $id)
+    {
+        if ($request->ajax() || $request->wantsJson()) {
+            $kategori = KategoriModel::find($id);
+            if (!$kategori) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Data tidak ditemukan'
+                ]);
+            }
+
+            try {
+                $kategori->delete();
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Data berhasil dihapus'
+                ]);
+            } catch (\Illuminate\Database\QueryException) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Data gagal dihapus karena masih terdapat tabel lain yang terkait dengan data ini'
+                ]);
+            }
+        }
+
+        return redirect('/');
+    }
 }
 
