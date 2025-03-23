@@ -1,34 +1,87 @@
-@extends('layouts.app')
- 
- {{-- Customize layout sections --}}
- 
- @section('subtitle', 'Kategori')
- @section('content_header_title', 'Home')
- @section('content_header_subtitle', 'Kategori')
- 
- @section('content')
-     <div class="container">
-         <div class="card">
-             <div class="card-header d-flex justify-content-between align-items-center" >
-                <h5>Manage Kategori</h5>
-            </div>
-             <div class="card-body" >
-             <a href="{{ url('kategori/create') }}" class="btn btn-primary btn-lg px-4 ml-auto">+ Add</a>
-                 {{ $dataTable->table() }}
-             </div>
-         </div>
-     </div>
- @endsection
+@extends('layouts.template')
 
- @push('styles')
-    <style>
-        .card-body {
-            max-height: 80vh; /* Sesuaikan tinggi agar footer tetap terlihat */
-            overflow-y: auto;
-        }
-    </style>
+@section('content')
+    <div class="card card-outline card-primary">
+        <div class="card-header">
+            <h3 class="card-title">{{ $page->title }}</h3>
+            <div class="card-tools">
+                <a class="btn btn-sm btn-primary mt-1" href="{{ url('kategori/create') }}">Tambah</a>
+                <button onclick="modalAction('{{ url('kategori/create_ajax') }}')" class="btn btn-sm btn-success mt-1">Tambah
+                    Ajax</button>
+            </div>
+        </div>
+        <div class="card-body">
+            @if (session('success'))
+                <div class="alert alert-success">{{ session('success') }}</div>
+            @endif
+            @if (session('error'))
+                <div class="alert alert-danger">{{ session('error') }}</div>
+            @endif
+            <table class="table table-bordered table-striped table-hover table-sm" id="table_kategori">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>kategori Kode</th>
+                        <th>kategori Nama</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+    <div id="myModal" class="modal fade animate shake" tabindex="-1" role="dialog" data-backdrop="static"
+        data-keyboard="false" data-width="75%" aria-hidden="true"></div>
+@endsection
+
+@push('css')
 @endpush
- 
- @push('scripts')
-     {{ $dataTable->scripts() }}
- @endpush
+
+@push('js')
+    <script>
+        function modalAction(url = '') {
+            $('#myModal').load(url, function() {
+                $('#myModal').modal('show');
+            });
+        }
+
+        var dataKategori
+        $(document).ready(function() {
+            dataKategori = $('#table_kategori').DataTable({
+                serverSide: true,
+                ajax: {
+                    "url": "{{ url('kategori/list') }}",
+                    "dataType": "json",
+                    "type": "POST",
+                    "data": {
+                        _token: "{{ csrf_token() }}"
+                    }
+                },
+                columns: [{
+                        data: "DT_RowIndex",
+                        className: "text-center",
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: "kategori_kode",
+                        className: "",
+                        orderable: true,
+                        searchable: true
+                    },
+                    {
+                        data: "kategori_nama",
+                        className: "",
+                        orderable: true,
+                        searchable: true
+                    },
+                    {
+                        data: "aksi",
+                        className: "",
+                        orderable: false,
+                        searchable: false
+                    }
+                ]
+            });
+        });
+    </script>
+@endpush
