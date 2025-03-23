@@ -92,6 +92,40 @@ class LevelController extends Controller
         return redirect('/level')->with('success', 'Data level berhasil disimpan');
     }
 
+    public function create_ajax()
+    {
+        $level = LevelModel::all();
+
+        return view('level.create_ajax', ['level' => $level]);
+    }
+
+    public function store_ajax(Request $request)
+    {
+        if ($request->ajax() || $request->wantsJson()) {
+            $rules = [
+                'level_kode' => 'required|string|max:3|regex:/^[A-Z]+$/',
+                'level_nama' => 'required|string|min:3|max:50|regex:/^[a-zA-Z\s]+$/'
+            ];
+
+            $validator = Validator::make($request->all(), $rules);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'status'   => false,
+                    'message'  => 'Validasi Gagal',
+                    'msgField' => $validator->errors(),
+                ]);
+            }
+
+            LevelModel::create($request->all());
+            return response()->json([
+                'status' => true,
+                'message' => 'Data Level berhasil disimpan'
+            ]);
+        }
+        redirect('/');
+    }
+
     public function show(string $id)
     {
         // Ambil data level berdasarkan ID
@@ -118,6 +152,13 @@ class LevelController extends Controller
 
         // Mengembalikan tampilan dengan data yang sudah dikonfigurasi
         return view('level.show', ['breadcrumb' => $breadcrumb, 'page' => $page, 'level' => $level, 'activeMenu' => $activeMenu]);
+    }
+
+    public function show_ajax(string $id)
+    {
+        $level = LevelModel::find($id);
+
+        return view('level.show_ajax', ['level' => $level]);
     }
 
     public function edit(string $id)
@@ -148,6 +189,13 @@ class LevelController extends Controller
         return view('level.edit', ['breadcrumb' => $breadcrumb, 'page' => $page, 'level' => $level, 'activeMenu' => $activeMenu]);
     }
 
+    public function edit_ajax(string $id)
+    {
+        $level = LevelModel::find($id);
+
+        return view('level.edit_ajax', ['level' => $level]);
+    }
+
     public function update(Request $request, string $id)
     {
         // Validasi input
@@ -164,6 +212,41 @@ class LevelController extends Controller
 
         // Redirect ke halaman level dengan pesan sukses
         return redirect('/level')->with('success', 'Data level berhasil diperbarui');
+    }
+
+    public function update_ajax(Request $request, $id)
+    {
+        if ($request->ajax() || $request->wantsJson()) {
+            $rules = [
+                'level_kode' => 'required|string|max:3|regex:/^[A-Z]+$/',
+                'level_nama' => 'required|string|min:3|max:50|regex:/^[a-zA-Z\s]+$/'
+            ];
+
+            $validator = Validator::make($request->all(), $rules);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'status'   => false,
+                    'message'  => 'Validasi gagal.',
+                    'msgField' => $validator->errors()
+                ]);
+            }
+
+            $check = LevelModel::find($id);
+            if ($check) {
+                $check->update($request->all());
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Data berhasil diupdate'
+                ]);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Data tidak ditemukan'
+                ]);
+            }
+        }
+        return redirect('/');
     }
 
     public function destroy(string $id)
@@ -184,5 +267,40 @@ class LevelController extends Controller
             // redirect kembali ke halaman dengan pesan error
             return redirect('/level')->with('error', 'Data level gagal dihapus karena masih terdapat tabel lain yang terkait dengan data ini');
         }
+    }
+
+    public function confirm_ajax(string $id)
+    {
+        $level = LevelModel::find($id);
+
+        return view('level.confirm_ajax', ['level' => $level]);
+    }
+
+    public function delete_ajax(Request $request, $id)
+    {
+        if ($request->ajax() || $request->wantsJson()) {
+            $level = LevelModel::find($id);
+            if (!$level) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Data tidak ditemukan'
+                ]);
+            }
+
+            try {
+                $level->delete();
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Data berhasil dihapus'
+                ]);
+            } catch (\Illuminate\Database\QueryException ) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Data gagal dihapus karena masih terdapat tabel lain yang terkait dengan data ini'
+                ]);
+            }
+        }
+
+        return redirect('/');
     }
 }

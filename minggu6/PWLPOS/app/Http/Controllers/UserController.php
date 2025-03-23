@@ -176,6 +176,12 @@ class UserController extends Controller
         return view('user.show', ['breadcrumb' => $breadcrumb, 'page' => $page, 'user' => $user, 'activeMenu' => $activeMenu]);
     }
 
+    public function show_ajax(string $id) {
+        $user = UserModel::with('level')->find($id);
+
+        return view('user.show_ajax', ['user' => $user]);
+    }
+
     // Menampilkan halaman form edit user
     public function edit(string $id)
     {
