@@ -5,8 +5,8 @@
         <div class="card-header">
         <h3 class="card-title">{{ $page->title ?? 'Daftar Supplier' }}</h3>
             <div class="card-tools">
-            <button onclick="modalAction('{{ url('/supplier/import') }}')" class="btn btn-info"><i class="fas fa-file-import"></i> Import Supplier</button>
-                <a class="btn btn-sm btn-primary mt-1" href="{{ url('supplier/create') }}">Tambah</a>
+                <button onclick="modalAction('{{ url('/supplier/import') }}')" class="btn btn-info"><i class="fas fa-file-import"></i> Import Supplier</button>
+                <a href="{{ url('/supplier/export_excel') }}" class="btn btn-primary"><i class="fa fa-file-excel"></i> Export Excel</a>
                 <button onclick="modalAction('{{ url('supplier/create_ajax') }}')" class="btn btn-success btn"><i class="fas fa-plus-circle"></i> Tambah Ajax</button>
             </div>
         </div>
