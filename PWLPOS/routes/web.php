@@ -50,6 +50,8 @@ use App\Http\Controllers\AuthController;
             Route::delete('/{id}', [LevelController::class, 'destroy']); // menghapus data level
             Route::get('/{id}/delete_ajax', [LevelController::class, 'confirm_ajax']); // menampilkan konfirmasi hapus level (ajax)
             Route::delete('/{id}/delete_ajax', [LevelController::class, 'delete_ajax']); // menghapus data level (ajax)
+            Route::get('/import', [LevelController::class, 'import']); // menampilkan halaman form upload excel level ajax
+            Route::post('/import_ajax', [LevelController::class, 'import_ajax']); // menyimpan import excel level ajax
         });
     });
 
@@ -95,6 +97,8 @@ use App\Http\Controllers\AuthController;
             Route::delete('/{id}', [UserController::class, 'destroy']); // menghapus data user
             Route::get('/{id}/delete_ajax', [UserController::class, 'confirm_ajax']); // menampilkan konfirmasi hapus user (ajax)
             Route::delete('/{id}/delete_ajax', [UserController::class, 'delete_ajax']); // menghapus data user (ajax)
+            Route::get('/import', [UserController::class, 'import']); // menampilkan halaman form upload excel user ajax
+            Route::post('/import_ajax', [UserController::class, 'import_ajax']); // menyimpan import excel user ajax
         });
     });
 
@@ -115,6 +119,8 @@ use App\Http\Controllers\AuthController;
             Route::delete('/{id}', [KategoriController::class, 'destroy']); // menghapus data kategori
             Route::get('/{id}/delete_ajax', [KategoriController::class, 'confirm_ajax']); // menampilkan konfirmasi hapus kategori (ajax)
             Route::delete('/{id}/delete_ajax', [KategoriController::class, 'delete_ajax']); // menghapus data kategori (ajax)
+            Route::get('/import', [KategoriController::class, 'import']); // menampilkan halaman form upload excel kategori ajax
+            Route::post('/import_ajax', [KategoriController::class, 'import_ajax']); // menyimpan import excel kategori ajax
         });
     });
 
@@ -135,6 +141,8 @@ use App\Http\Controllers\AuthController;
             Route::delete('/{id}', [SupplierController::class, 'destroy']); // menghapus data supplier
             Route::get('/{id}/delete_ajax', [SupplierController::class, 'confirm_ajax']); // menampilkan konfirmasi hapus supplier (ajax)
             Route::delete('/{id}/delete_ajax', [SupplierController::class, 'delete_ajax']); // menghapus data supplier (ajax)
+            Route::get('/import', [SupplierController::class, 'import']); // menampilkan halaman form upload excel supplier ajax
+            Route::post('/import_ajax', [SupplierController::class, 'import_ajax']); // menyimpan import excel supplier ajax
         });
     });
 });

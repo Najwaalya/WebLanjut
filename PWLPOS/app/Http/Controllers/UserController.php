@@ -7,55 +7,56 @@ use App\Models\UserModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class UserController extends Controller
 {
     public function index()
     {
-        // Menampilkan halaman awal user
-        $breadcrumb = (object) [
-            'title' => 'Daftar User',
-            'list'  => ['Home', 'User']
-        ];
+        $activeMenu = 'user'; 
 
-        $page = (object) [
-            'title' => 'Daftar user yang terdaftar dalam sistem'
-        ];
+        $breadcrumb = (object) [ 
+            'title' => 'Data User', 
+            'list'  => ['Home', 'User'] 
+        ]; 
 
-        $activeMenu = 'user'; // set menu yang sedang aktif
+        $level = LevelModel::select('level_id', 'level_nama')->get(); 
 
-        $level = LevelModel::all(); // Ambil data level untuk filter level
-        return view('user.index', ['breadcrumb' => $breadcrumb, 'page' => $page, 'level' => $level, 'activeMenu' => $activeMenu]);
- 
+        return view('user.index', [ 
+            'activeMenu' => $activeMenu, 
+            'breadcrumb' => $breadcrumb, 
+            'level'      => $level 
+        ]); 
     }
+
 
     // Ambil data user dalam bentuk JSON untuk DataTables 
-    public function list(Request $request)
-    {
-        $users = UserModel::select('user_id', 'username', 'nama', 'level_id')
-            ->with('level');
+    public function list(Request $request) 
+    { 
+        $users = UserModel::select(
+            'user_id', 
+            'username', 
+            'nama', 
+            'level_id'
+        )->with('level'); 
 
-        if ($request->level_id) {
-            $users->where('level_id', $request->level_id);
-        }
+        $level_id = $request->input('level_id'); 
+        if (!empty($level_id)) { 
+            $users->where('level_id', $level_id); 
+        } 
 
-        return DataTables::of($users)
-            ->addIndexColumn()
+        return DataTables::of($users) 
+            ->addIndexColumn() 
             ->addColumn('aksi', function ($user) {
-                // $btn = '<a href="'.url('/user/' .$user->user_id).'" class="btn btn-info btn-sm">Detail</a> ';
-                // $btn .= '<a href="'.url('/user/' .$user->user_id . '/edit').'" class="btn btn-warning btn-sm">Edit</a> ';
-                // $btn .= '<form class="d-inline-block" method="POST" action="'.url('/user/'.$user->user_id).'">'
-                //      . csrf_field() . method_field('DELETE')
-                //      . '<button type="submit" class="btn btn-danger btn-sm" onclick="return confirm(\'Apakah anda yakin menghapus data ini?\');">Hapus</button></form>';
-
-                $btn = '<button onclick="modalAction(\'' . url('/user/' . $user->user_id . '/show_ajax') . '\')" class="btn btn-info btn-sm">Detail</button>';
-                $btn .= '<button onclick="modalAction(\'' . url('/user/' . $user->user_id . '/edit_ajax') . '\')" class="btn btn-warning btn-sm">Edit</button>';
-                $btn .= '<button onclick="modalAction(\'' . url('/user/' . $user->user_id . '/delete_ajax') . '\')" class="btn btn-danger btn-sm">Hapus</button>';
+                $btn = '<button onclick="modalAction(\'' . url('/user/' . $user->user_id . '/show_ajax') . '\')" class="btn btn-info btn-sm">Detail</button> ';
+                $btn .= '<button onclick="modalAction(\'' . url('/user/' . $user->user_id . '/edit_ajax') . '\')" class="btn btn-warning btn-sm">Edit</button> ';
+                $btn .= '<button onclick="modalAction(\'' . url('/user/' . $user->user_id . '/delete_ajax') . '\')" class="btn btn-danger btn-sm">Hapus</button> ';
                 return $btn;
-            })
-            ->rawColumns(['aksi'])
-            ->make(true);
+            }) 
+            ->rawColumns(['aksi']) 
+            ->make(true); 
     }
+
 
     // Menampilkan halaman form tambah user
     public function create()
@@ -337,6 +338,68 @@ class UserController extends Controller
                 ]);
             }
         }
+        return redirect('/');
+    }
+
+    public function import() 
+    { 
+        return view('user.import'); 
+    }
+
+    public function import_ajax(Request $request)
+    {
+        if ($request->ajax() || $request->wantsJson()) {
+            $rules = [
+                'file_user' => ['required', 'mimes:xlsx', 'max:1024'] // validasi file excel
+            ];
+
+            $validator = Validator::make($request->all(), $rules);
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Validasi Gagal',
+                    'msgField' => $validator->errors()
+                ]);
+            }
+
+            $file = $request->file('file_user');
+
+            $reader = IOFactory::createReader('Xlsx');
+            $reader->setReadDataOnly(true);
+            $spreadsheet = $reader->load($file->getRealPath());
+            $sheet = $spreadsheet->getActiveSheet();
+            $data = $sheet->toArray(null, false, true, true);
+
+            $insert = [];
+            if (count($data) > 1) {
+                foreach ($data as $row => $value) {
+                    if ($row > 1) { // Lewati baris header
+                        $insert[] = [
+                            'username'   => $value['A'],
+                            'nama'       => $value['B'],
+                            'password'   => bcrypt($value['C']), // hash password
+                            'level_id'   => $value['D'],
+                            'created_at' => now()
+                        ];
+                    }
+                }
+
+                if (count($insert) > 0) {
+                    UserModel::insertOrIgnore($insert);
+                }
+
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Data User berhasil diimport'
+                ]);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Tidak ada data yang diimport'
+                ]);
+            }
+        }
+
         return redirect('/');
     }
 }

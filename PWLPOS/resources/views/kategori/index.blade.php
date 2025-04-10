@@ -3,11 +3,11 @@
 @section('content')
     <div class="card card-outline card-primary">
         <div class="card-header">
-            <h3 class="card-title">{{ $page->title }}</h3>
+        <h3 class="card-title">{{ $page->title ?? 'Daftar Kategori' }}</h3>
             <div class="card-tools">
+            <button onclick="modalAction('{{ url('/kategori/import') }}')" class="btn btn-info">Import Kategori</button>
                 <a class="btn btn-sm btn-primary mt-1" href="{{ url('kategori/create') }}">Tambah</a>
-                <button onclick="modalAction('{{ url('kategori/create_ajax') }}')" class="btn btn-sm btn-success mt-1">Tambah
-                    Ajax</button>
+                <button onclick="modalAction('{{ url('kategori/create_ajax') }}')" class="btn btn-sm btn-success mt-1">Tambah Ajax</button>
             </div>
         </div>
         <div class="card-body">
@@ -20,7 +20,7 @@
             <table class="table table-bordered table-striped table-hover table-sm" id="table_kategori">
                 <thead>
                     <tr>
-                        <th>ID</th>
+                        <th>No</th>
                         <th>kategori Kode</th>
                         <th>kategori Nama</th>
                         <th>Aksi</th>
@@ -29,8 +29,7 @@
             </table>
         </div>
     </div>
-    <div id="myModal" class="modal fade animate shake" tabindex="-1" role="dialog" data-backdrop="static"
-        data-keyboard="false" data-width="75%" aria-hidden="true"></div>
+    <div id="myModal" class="modal fade animate shake" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false" data-width="75%" aria-hidden="true"></div>
 @endsection
 
 @push('css')
@@ -47,6 +46,7 @@
         var dataKategori
         $(document).ready(function() {
             dataKategori = $('#table_kategori').DataTable({
+                processing: true,
                 serverSide: true,
                 ajax: {
                     "url": "{{ url('kategori/list') }}",
@@ -56,31 +56,46 @@
                         _token: "{{ csrf_token() }}"
                     }
                 },
-                columns: [{
+                columns: [
+                    {
                         data: "DT_RowIndex",
                         className: "text-center",
                         orderable: false,
-                        searchable: false
+                        searchable: false,
+                        width: "5%"
                     },
                     {
                         data: "kategori_kode",
                         className: "",
                         orderable: true,
-                        searchable: true
+                        searchable: true,
+                        width: "20%"
                     },
                     {
                         data: "kategori_nama",
                         className: "",
                         orderable: true,
-                        searchable: true
+                        searchable: true,
+                        width: "50%"
                     },
                     {
                         data: "aksi",
-                        className: "",
+                        className: "text-center",
                         orderable: false,
-                        searchable: false
+                        searchable: false,
+                        width: "25%"
                     }
                 ]
+            });
+
+            $('#table_kategori_filter input').unbind().bind().on('keyup', function (e) {
+                if (e.keyCode == 13) {
+                    dataKategori.search(this.value).draw();  // Gantilah 'dataKategori' dengan nama DataTable yang digunakan untuk kategori
+                }
+            });
+
+            $('#myModal').on('hidden.bs.modal', function () {
+                dataKategori.ajax.reload();  // Gantilah 'dataKategori' dengan nama DataTable yang digunakan untuk kategori
             });
         });
     </script>

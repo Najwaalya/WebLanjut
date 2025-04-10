@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\LevelModel;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Validator;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 use Illuminate\Http\Request;
 
@@ -12,18 +13,6 @@ class LevelController extends Controller
 {
     public function index()
     {
-        //DB::insert('insert into m_level(level_kode, level_nama, created_at) values(?, ?, ?)', ['CUS', 'Pelanggan', now()]);
-        //return "Inserts data baru berhasil";
-
-        //$row = DB::update('update m_level set level_nama =? where level_kode =?', ['Customer', 'CUS']);
-        //return "Update data berhasil. Jumlah data yang diupdate: ". $row.' baris';
-
-        //$row = DB::update('delete from m_level where level_kode = ?', ['CUS']);
-        //return 'Delete data berhasil. Jumlah data yang dihapus: ' .$row.' baris';
-
-        //$data = DB::select('select * from m_level');
-        //return view ('level', ['data' => $data]);
-
         $breadcrumb = (object) [
             'title' => 'Daftar Level User',
             'list'  => ['Home', 'Level']
@@ -40,30 +29,29 @@ class LevelController extends Controller
 
     public function list(Request $request)
     {
-        $level = LevelModel::select('level_id', 'level_kode', 'level_nama');
+        $levels = LevelModel::select(
+            'level_id',
+            'level_kode',
+            'level_nama'
+        );
 
-        if ($request->level_id) {
-            $level->where('level_id', $request->level_id);
+        $level_id = $request->input('level_id');
+        if (!empty($level_id)) {
+            $levels->where('level_id', $level_id);
         }
 
-        return DataTables::of($level)
+        return DataTables::of($levels)
             ->addIndexColumn()
             ->addColumn('aksi', function ($level) {
-                // $btn = '<a href="'.url('/level/' .$level->level_id).'" class="btn btn-info btn-sm">Detail</a> ';
-                // $btn .= '<a href="'.url('/level/' .$level->level_id . '/edit').'" class="btn btn-warning btn-sm">Edit</a> ';
-                // $btn .= '<form class="d-inline-block" method="POST" action="'.url('/level/'.$level->level_id).'">'
-                //      . csrf_field() . method_field('DELETE')
-                //      . '<button type="submit" class="btn btn-danger btn-sm" onclick="return confirm(\'Apakah anda yakin menghapus data ini?\');">Hapus</button></form>';
-
-                $btn = '<button onclick="modalAction(\'' . url('/level/' . $level->level_id . '/show_ajax') . '\')" class="btn btn-info btn-sm">Detail</button>';
-                $btn .= '<button onclick="modalAction(\'' . url('/level/' . $level->level_id . '/edit_ajax') . '\')" class="btn btn-warning btn-sm">Edit</button>';
+                $btn = '<button onclick="modalAction(\'' . url('/level/' . $level->level_id . '/show_ajax') . '\')" class="btn btn-info btn-sm">Detail</button> ';
+                $btn .= '<button onclick="modalAction(\'' . url('/level/' . $level->level_id . '/edit_ajax') . '\')" class="btn btn-warning btn-sm">Edit</button> ';
                 $btn .= '<button onclick="modalAction(\'' . url('/level/' . $level->level_id . '/delete_ajax') . '\')" class="btn btn-danger btn-sm">Hapus</button>';
                 return $btn;
             })
             ->rawColumns(['aksi'])
             ->make(true);
     }
-
+    
     public function create()
     {
         $breadcrumb = (object) [
@@ -313,4 +301,65 @@ class LevelController extends Controller
 
         return redirect('/');
     }
+
+    public function import() 
+    { 
+        return view('level.import'); 
+    }
+
+    public function import_ajax(Request $request)
+    {
+        if ($request->ajax() || $request->wantsJson()) {
+            $rules = [
+                'file_level' => ['required', 'mimes:xlsx', 'max:1024']
+            ];
+
+            $validator = Validator::make($request->all(), $rules);
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Validasi Gagal',
+                    'msgField' => $validator->errors()
+                ]);
+            }
+
+            $file = $request->file('file_level');
+
+            $reader = IOFactory::createReader('Xlsx');
+            $reader->setReadDataOnly(true);
+            $spreadsheet = $reader->load($file->getRealPath());
+            $sheet = $spreadsheet->getActiveSheet();
+            $data = $sheet->toArray(null, false, true, true);
+
+            $insert = [];
+            if (count($data) > 1) {
+                foreach ($data as $row => $value) {
+                    if ($row > 1) {
+                        $insert[] = [
+                            'level_kode' => $value['A'],
+                            'level_nama' => $value['B'],
+                            'created_at' => now()
+                        ];
+                    }
+                }
+
+                if (count($insert) > 0) {
+                    LevelModel::insertOrIgnore($insert);
+                }
+
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Data Level berhasil diimport'
+                ]);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Tidak ada data yang diimport'
+                ]);
+            }
+        }
+
+        return redirect('/');
+    }
+
 }

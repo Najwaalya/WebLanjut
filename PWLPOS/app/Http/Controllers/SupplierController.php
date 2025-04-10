@@ -6,6 +6,7 @@
  use App\Models\SupplierModel;
  use Yajra\DataTables\Facades\DataTables;
  use Illuminate\Support\Facades\Validator;
+ use PhpOffice\PhpSpreadsheet\IOFactory;
  
  class SupplierController extends Controller
  {
@@ -27,29 +28,30 @@
  
      public function list(Request $request)
      {
-         $supplier = SupplierModel::select('supplier_id', 'supplier_kode', 'supplier_nama', 'supplier_alamat');
- 
-         if ($request->supplier_id) {
-             $supplier->where('supplier_id', $request->supplier_id);
+         $supplier = SupplierModel::select(
+             'supplier_id',
+             'supplier_kode',
+             'supplier_nama',
+             'supplier_alamat'
+         );
+     
+         $supplier_id = $request->input('supplier_id');
+         if (!empty($supplier_id)) {
+             $supplier->where('supplier_id', $supplier_id);
          }
- 
+     
          return DataTables::of($supplier)
              ->addIndexColumn()
              ->addColumn('aksi', function ($supplier) {
-                 // $btn = '<a href="'.url('/supplier/' .$supplier->supplier_id).'" class="btn btn-info btn-sm">Detail</a> ';
-                 // $btn .= '<a href="'.url('/supplier/' .$supplier->supplier_id . '/edit').'" class="btn btn-warning btn-sm">Edit</a> ';
-                 // $btn .= '<form class="d-inline-block" method="POST" action="'.url('/supplier/'.$supplier->supplier_id).'">'
-                 //      . csrf_field() . method_field('DELETE')
-                 //      . '<button type="submit" class="btn btn-danger btn-sm" onclick="return confirm(\'Apakah anda yakin menghapus data ini?\');">Hapus</button></form>';
- 
-                 $btn = '<button onclick="modalAction(\'' . url('/supplier/' . $supplier->supplier_id . '/show_ajax') . '\')" class="btn btn-info btn-sm">Detail</button>';
-                 $btn .= '<button onclick="modalAction(\'' . url('/supplier/' . $supplier->supplier_id . '/edit_ajax') . '\')" class="btn btn-warning btn-sm">Edit</button>';
+                 $btn = '<button onclick="modalAction(\'' . url('/supplier/' . $supplier->supplier_id . '/show_ajax') . '\')" class="btn btn-info btn-sm">Detail</button> ';
+                 $btn .= '<button onclick="modalAction(\'' . url('/supplier/' . $supplier->supplier_id . '/edit_ajax') . '\')" class="btn btn-warning btn-sm">Edit</button> ';
                  $btn .= '<button onclick="modalAction(\'' . url('/supplier/' . $supplier->supplier_id . '/delete_ajax') . '\')" class="btn btn-danger btn-sm">Hapus</button>';
                  return $btn;
              })
              ->rawColumns(['aksi'])
              ->make(true);
      }
+     
  
      public function create()
      {
@@ -269,6 +271,67 @@
                 return response()->json([
                     'status' => false,
                     'message' => 'Data gagal dihapus karena masih terdapat tabel lain yang terkait dengan data ini'
+                ]);
+            }
+        }
+
+        return redirect('/');
+    }
+
+    public function import() 
+    { 
+        return view('supplier.import'); 
+    }
+
+    public function import_ajax(Request $request)
+    {
+        if ($request->ajax() || $request->wantsJson()) {
+            $rules = [
+                'file_supplier' => ['required', 'mimes:xlsx', 'max:1024']
+            ];
+
+            $validator = Validator::make($request->all(), $rules);
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Validasi Gagal',
+                    'msgField' => $validator->errors()
+                ]);
+            }
+
+            $file = $request->file('file_supplier');
+
+            $reader = IOFactory::createReader('Xlsx');
+            $reader->setReadDataOnly(true);
+            $spreadsheet = $reader->load($file->getRealPath());
+            $sheet = $spreadsheet->getActiveSheet();
+            $data = $sheet->toArray(null, false, true, true);
+
+            $insert = [];
+            if (count($data) > 1) {
+                foreach ($data as $row => $value) {
+                    if ($row > 1) {
+                        $insert[] = [
+                            'supplier_kode'   => $value['A'],
+                            'supplier_nama'   => $value['B'],
+                            'supplier_alamat' => $value['C'],
+                            'created_at'      => now()
+                        ];
+                    }
+                }
+
+                if (count($insert) > 0) {
+                    SupplierModel::insertOrIgnore($insert);
+                }
+
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Data Supplier berhasil diimport'
+                ]);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Tidak ada data yang diimport'
                 ]);
             }
         }
