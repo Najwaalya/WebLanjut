@@ -139,10 +139,9 @@ class KategoriController extends Controller
 
      public function show_ajax(string $id)
      {
-         $kategori = KategoriModel::findOrFail($id);
-     
+         $kategori = KategoriModel::find($id);
          return view('kategori.show_ajax', ['kategori' => $kategori]);
-     }
+     }  
  
      public function edit(string $id)
      {
@@ -162,10 +161,10 @@ class KategoriController extends Controller
          return view('kategori.edit', ['breadcrumb' => $breadcrumb, 'page' => $page, 'kategori' => $kategori, 'activeMenu' => $activeMenu]);
      }
 
-     public function edit_ajax(string $id)
+     public function edit_ajax($id)
      {
-         $kategori = KategoriModel::findOrFail($id);
-     
+         $kategori = KategoriModel::find($id);
+ 
          return view('kategori.edit_ajax', ['kategori' => $kategori]);
      }
  
@@ -187,40 +186,32 @@ class KategoriController extends Controller
      }
 
      public function update_ajax(Request $request, $id)
-    {
-        if ($request->ajax() || $request->wantsJson()) {
-            $rules = [
-                'kategori_kode' => 'required|string|max:6|regex:/^[A-Z0-9]+$/',
-                'kategori_nama' => 'required|string|min:3|max:50|regex:/^[a-zA-Z\s]+$/',
-            ];
-
-            $validator = Validator::make($request->all(), $rules);
-
-            if ($validator->fails()) {
-                return response()->json([
-                    'status'   => false,
-                    'message'  => 'Validasi gagal.',
-                    'msgField' => $validator->errors()
-                ]);
-            }
-
-            $check = kategoriModel::find($id);
-            if ($check) {
-                $check->update($request->all());
-                return response()->json([
-                    'status' => true,
-                    'message' => 'Data berhasil diupdate'
-                ]);
-            } else {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Data tidak ditemukan'
-                ]);
-            }
-        }
-        return redirect('/');
-    }
+     {
+         if ($request->ajax() || $request->wantsJson()) {
+             $rules = [
+                 'kategori_kode' => 'required|unique:m_kategori,kategori_kode,' . $id . ',kategori_id',
+                 'kategori_nama' => 'required'
+             ];
  
+             $validator = Validator::make($request->all(), $rules);
+ 
+             if ($validator->fails()) {
+                 return response()->json([
+                     'status' => false,
+                     'message' => 'Validasi Gagal',
+                     'msgField' => $validator->errors(),
+                 ]);
+             }
+ 
+             KategoriModel::find($id)->update($request->all());
+             return response()->json([
+                 'status' => true,
+                 'message' => 'Data user berhasil diubah'
+             ]);
+         }
+         redirect('/');
+     }
+     
      public function destroy(string $id)
      {
          $check = KategoriModel::find($id);
@@ -246,28 +237,30 @@ class KategoriController extends Controller
     public function delete_ajax(Request $request, $id)
     {
         if ($request->ajax() || $request->wantsJson()) {
-            $kategori = KategoriModel::find($id);
-            if (!$kategori) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Data tidak ditemukan'
-                ]);
-            }
-
             try {
-                $kategori->delete();
-                return response()->json([
-                    'status' => true,
-                    'message' => 'Data berhasil dihapus'
-                ]);
-            } catch (\Illuminate\Database\QueryException $e) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Data gagal dihapus karena masih terdapat tabel lain yang terkait dengan data ini'
-                ]);
+                $check = KategoriModel::find($id);
+                if ($check) {
+                    $check->delete();
+                    return response()->json([
+                        'status' => true,
+                        'message' => 'Data berhasil dihapus'
+                    ]);
+                } else {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Data tidak ditemukan'
+                    ]);
+                }
+            } catch (\Exception $e) {
+                Log::error('Error deleting user: ' . $e->getMessage());
+                if (str_contains($e->getMessage(), 'SQLSTATE[23000]')) {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Data tidak dapat dihapus karena masih terkait dengan data lain di sistem'
+                    ]);
+                }
             }
         }
-
         return redirect('/');
     }
 

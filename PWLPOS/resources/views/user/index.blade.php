@@ -5,9 +5,9 @@
         <div class="card-header">
             <h3 class="card-title">{{ $page->title ?? 'Daftar User' }}</h3>
             <div class="card-tools">
-                <button onclick="modalAction('{{ url('/user/import') }}')" class="btn btn-info">Import User</button>
+                <button onclick="modalAction('{{ url('/user/import') }}')" class="btn btn-info"><i class="fas fa-file-import"></i> Import User</button>
                 <a class="btn btn-sm btn-primary mt-1" href="{{ url('user/create') }}">Tambah</a>
-                <button onclick="modalAction('{{ url('user/create_ajax') }}')" class="btn btn-sm btn-success mt-1">Tambah Ajax</button>
+                <button onclick="modalAction('{{ url('user/create_ajax') }}')" class="btn btn-success btn"><i class="fas fa-plus-circle"></i> Tambah Ajax</button>
             </div>
         </div>
         <div class="card-body">
