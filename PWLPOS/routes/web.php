@@ -8,6 +8,7 @@ use App\Http\Controllers\WelcomeController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\BarangController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ProfileController;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,6 +31,16 @@ use App\Http\Controllers\AuthController;
  Route::middleware(['auth'])->group(function () { // artinya semua route di dalam group ini harus login dulu
  
      Route::get('/', [WelcomeController::class, 'index']);
+     
+
+     Route::group(['prefix' => 'profile'], function () {
+        Route::get('/', [ProfileController::class, 'index']);
+        Route::post('/update_photo', [ProfileController::class, 'update_photo']);
+        Route::post('/logout', function () {
+            Auth::logout();
+            return redirect('/login');
+        })->name('logout');
+    });
 
     // route Level
     // artinya semua route di dalam group ini harus punya role ADM (Administrator)

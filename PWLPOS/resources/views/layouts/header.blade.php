@@ -127,6 +127,43 @@
           <i class="fas fa-expand-arrows-alt"></i>
         </a>
       </li>
+
+      <!-- User Profile Dropdown -->
+      <li class="nav-item dropdown user-menu">
+        <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">
+          <img src="{{ Auth::user()->foto ? asset('storage/foto/' . Auth::user()->foto) : asset('adminlte/dist/img/user4-128x128.jpg') }}"
+              class="user-image" alt="User Image"
+              style="object-fit: cover; width: 25px; height: 25px;">
+          <span class="d-none d-md-inline ml-2">{{ Auth::user()->nama }}</span> <!-- Tambahkan ini -->
+        </a>
+        <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+          
+          <!-- User Info Header -->
+          <li class="dropdown-item d-flex align-items-center">
+            <img src="{{ Auth::user()->foto ? asset('storage/foto/' . Auth::user()->foto) : asset('adminlte/dist/img/user4-128x128.jpg') }}"
+                class="img-circle mr-2" alt="User Image"
+                style="object-fit: cover; width: 50px; height: 50px;">
+            <span class="font-weight-bold">{{ Auth::user()->nama }}</span>
+          </li>
+
+          <li class="dropdown-divider"></li>
+
+          <!-- Lihat Profil -->
+          <li>
+            <a href="{{ url('/profile') }}" class="dropdown-item">
+              <i class="fas fa-user mr-2"></i> Lihat Profil
+            </a>
+          </li>
+
+          <!-- Logout -->
+          <li>
+            <a href="{{ url('/logout') }}" class="dropdown-item text-danger" onclick="confirmLogout(event)">
+              <i class="fas fa-sign-out-alt mr-2"></i> Logout
+            </a>
+          </li>
+        </ul>
+      </li>
+
       <li class="nav-item">
         <a class="nav-link" data-widget="control-sidebar" data-slide="true" href="#" role="button">
           <i class="fas fa-th-large"></i>
@@ -135,3 +172,27 @@
     </ul>
   </nav>
   <!-- /.navbar -->
+
+<!-- konfirmasi logout -->
+ <!-- SweetAlert2 -->
+ <script src="{{ asset('adminlte/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
+ <script>
+     function confirmLogout(event) {
+         event.preventDefault();
+ 
+         Swal.fire({
+             title: 'Logout?',
+             text: "Apakah kamu yakin ingin keluar?",
+             icon: 'warning',
+             showCancelButton: true,
+             confirmButtonColor: '#d33',
+             cancelButtonColor: '#3085d6',
+             confirmButtonText: 'Ya, Logout',
+             cancelButtonText: 'Batal'
+         }).then((result) => {
+             if (result.isConfirmed) {
+                 window.location.href = "{{ url('/logout') }}";
+             }
+         });
+     }
+ </script>
