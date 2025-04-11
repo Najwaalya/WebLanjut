@@ -7,6 +7,7 @@
             <div class="card-tools">
                 <button onclick="modalAction('{{ url('/kategori/import') }}')" class="btn btn-info"><i class="fas fa-file-import"></i> Import Kategori</button>
                 <a href="{{ url('/kategori/export_excel') }}" class="btn btn-primary"><i class="fa fa-file-excel"></i> Export Excel</a>
+                <a href="{{ url('/kategori/export_pdf') }}" class="btn btn-warning"><i class="fa fa-file-pdf"></i> Export PDF</a> 
                 <button onclick="modalAction('{{ url('kategori/create_ajax') }}')" class="btn btn-success btn"><i class="fas fa-plus-circle"></i> Tambah Ajax</button>
             </div>
         </div>

@@ -405,4 +405,19 @@ class LevelController extends Controller
         $writer->save('php://output');
         exit;
     }
+
+    public function export_pdf()
+    {
+        set_time_limit(300);
+    
+        $level = LevelModel::select('level_kode', 'level_nama')
+            ->orderBy('level_kode')
+            ->get();
+    
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('level.export_pdf', ['level' => $level]);
+        $pdf->setPaper('a4', 'portrait');
+        $pdf->setOption("isRemoteEnabled", true);
+    
+        return $pdf->stream('Data Level_' . date('Y-m-d H:i:s') . '.pdf');
+    }    
 }

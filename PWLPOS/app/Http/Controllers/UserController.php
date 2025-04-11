@@ -452,4 +452,22 @@ class UserController extends Controller
         $writer->save('php://output');
         exit;
     }
+
+    public function export_pdf()
+    {
+        set_time_limit(300);
+    
+        $user = UserModel::select('username', 'nama', 'level_id')
+            ->orderBy('username')
+            ->with('level')
+            ->get();
+    
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('user.export_pdf', [
+            'user' => $user
+        ]);
+        $pdf->setPaper('a4', 'portrait');
+        $pdf->setOption("isRemoteEnabled", true);
+    
+        return $pdf->stream('Data User_' . date('Y-m-d H:i:s') . '.pdf');
+    }    
 }

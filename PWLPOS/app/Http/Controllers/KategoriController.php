@@ -371,4 +371,20 @@ class KategoriController extends Controller
         $writer->save('php://output');
         exit;
     }
+
+    public function export_pdf()
+    {
+        set_time_limit(300);
+    
+        $kategori = KategoriModel::select('kategori_kode', 'kategori_nama')
+            ->orderBy('kategori_kode')
+            ->get();
+    
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('kategori.export_pdf', ['kategori' => $kategori]);
+        $pdf->setPaper('a4', 'portrait');
+        $pdf->setOption("isRemoteEnabled", true);
+    
+        return $pdf->stream('Data Kategori_' . date('Y-m-d H:i:s') . '.pdf');
+    }
+    
 }

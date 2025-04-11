@@ -386,4 +386,22 @@
         $writer->save('php://output');
         exit;
     }
+
+    public function export_pdf()
+    {
+        set_time_limit(300);
+    
+        $supplier = SupplierModel::select('supplier_kode', 'supplier_nama', 'supplier_alamat')
+            ->orderBy('supplier_kode')
+            ->get();
+    
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('supplier.export_pdf', [
+            'supplier' => $supplier
+        ]);
+        $pdf->setPaper('a4', 'portrait');
+        $pdf->setOption("isRemoteEnabled", true);
+    
+        return $pdf->stream('Data Supplier_' . date('Y-m-d H:i:s') . '.pdf');
+    }
+    
  }
