@@ -220,12 +220,13 @@
          return view('barang.edit', ['breadcrumb' => $breadcrumb, 'page' => $page, 'barang' => $barang, 'kategori' => $kategori, 'activeMenu' => $activeMenu]);
      }
 
-     public function edit_ajax(string $id) {
-        $barang = BarangModel::find($id);
-        $kategori = KategoriModel::select('kategori_id', 'kategori_nama')->get();
-
-        return view('barang.edit_ajax', ['barang' => $barang, 'kategori' => $kategori]);
-    }
+     public function edit_ajax(string $id)
+     {
+         $barang = BarangModel::find($id);
+         $kategori = KategoriModel::select('kategori_id', 'kategori_nama')->get();
+     
+         return view('barang.edit_ajax', ['barang' => $barang, 'kategori' => $kategori]);
+     }     
  
      // Menyimpan perubahan data barang
      public function update(Request $request, string $id)
@@ -255,15 +256,15 @@
      {
          if ($request->ajax() || $request->wantsJson()) {
              $rules = [
-                 'kategori_id' => 'required|exists:m_kategori,kategori_id',
-                 'barang_kode' => 'required|min:3|unique:m_barang,kode_barang,' . $id . ',barang_id',
-                 'barang_nama' => 'required|min:3',
-                 'harga_beli' => 'required|numeric|min:1',
-                 'harga_jual' => 'required|numeric|min:1',
+                 'kategori_id'   => 'required|exists:m_kategori,kategori_id',
+                 'barang_kode'   => 'required|min:3|unique:m_barang,kode_barang,' . $id . ',barang_id',
+                 'barang_nama'   => 'required|min:3',
+                 'harga_beli'    => 'required|numeric|min:1',
+                 'harga_jual'    => 'required|numeric|min:1',
              ];
- 
+     
              $validator = Validator::make($request->all(), $rules);
- 
+     
              if ($validator->fails()) {
                  return response()->json([
                      'status' => false,
@@ -271,13 +272,20 @@
                      'msgField' => $validator->errors(),
                  ]);
              }
- 
-             $check = BarangModel::find($id);
-             if ($check) {
-                 $check->update($request->all());
+     
+             $barang = BarangModel::find($id);
+             if ($barang) {
+                 $barang->update([
+                     'kategori_id'   => $request->kategori_id,
+                     'kode_barang'   => $request->barang_kode,
+                     'nama_barang'   => $request->barang_nama,
+                     'harga_beli'    => $request->harga_beli,
+                     'harga_jual'    => $request->harga_jual,
+                 ]);
+     
                  return response()->json([
                      'status' => true,
-                     'message' => 'Data berhasil diupdate'
+                     'message' => 'Data barang berhasil diperbarui'
                  ]);
              } else {
                  return response()->json([
@@ -286,8 +294,9 @@
                  ]);
              }
          }
+     
          return redirect('/');
-     } 
+     }      
  
      // Menghapus data barang
      public function destroy(string $id)

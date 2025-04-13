@@ -1,9 +1,9 @@
-<form action="{{ url('/penjualan/import_ajax') }}" method="POST" id="form-import-penjualan" enctype="multipart/form-data">
+<form action="{{ url('/retur_penjualan/import_ajax') }}" method="POST" id="form-import-retur" enctype="multipart/form-data">
     @csrf
-    <div id="modal-penjualan" class="modal-dialog modal-md" role="document">
+    <div id="modal-master" class="modal-dialog modal-md" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Import Data Penjualan</h5>
+                <h5 class="modal-title">Import Data Retur Penjualan</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -11,15 +11,15 @@
             <div class="modal-body">
                 <div class="form-group">
                     <label>Download Template</label>
-                    <a href="{{ asset('template_penjualan.xlsx') }}" class="btn btn-info btn-sm" download>
+                    <a href="{{ asset('template_retur_penjualan.xlsx') }}" class="btn btn-info btn-sm" download>
                         <i class="fa fa-file-excel"></i> Download Template
                     </a>
                     <small id="error-template" class="error-text form-text text-danger"></small>
                 </div>
                 <div class="form-group">
                     <label>Pilih File Excel</label>
-                    <input type="file" name="file_penjualan" id="file_penjualan" class="form-control" required>
-                    <small id="error-file_penjualan" class="error-text form-text text-danger"></small>
+                    <input type="file" name="file_retur" id="file_retur" class="form-control" required>
+                    <small id="error-file_retur" class="error-text form-text text-danger"></small>
                 </div>
             </div>
             <div class="modal-footer">
@@ -32,9 +32,9 @@
 
 <script>
     $(document).ready(function () {
-        $("#form-import-penjualan").validate({
+        $("#form-import-retur").validate({
             rules: {
-                file_penjualan: { required: true, extension: "xlsx" },
+                file_retur: { required: true, extension: "xlsx" },
             },
             submitHandler: function (form) {
                 let formData = new FormData(form);
@@ -46,33 +46,24 @@
                     contentType: false,
                     success: function (response) {
                         if (response.status) {
-                            $('#modal-penjualan').modal('hide');
+                            $('#myModal').modal('hide');
                             Swal.fire({
                                 icon: 'success',
                                 title: 'Berhasil',
                                 text: response.message
                             });
-                            dataPenjualan.ajax.reload(); // reload datatable penjualan
+                            tableRetur.ajax.reload(); // reload datatable retur penjualan
                         } else {
                             $('.error-text').text('');
-                            if (response.msgField) {
-                                $.each(response.msgField, function (prefix, val) {
-                                    $('#error-' + prefix).text(val[0]);
-                                });
-                            }
+                            $.each(response.msgField, function (prefix, val) {
+                                $('#error-' + prefix).text(val[0]);
+                            });
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Gagal',
                                 text: response.message
                             });
                         }
-                    },
-                    error: function () {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: 'Gagal mengirim permintaan ke server.'
-                        });
                     }
                 });
                 return false;

@@ -1,4 +1,4 @@
-@empty($barang)
+@empty($retur)
     <div id="modal-master" class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -12,59 +12,53 @@
                     <h5><i class="icon fas fa-ban"></i> Kesalahan!!!</h5>
                     Data yang anda cari tidak ditemukan
                 </div>
-                <a href="{{ url('/barang') }}" class="btn btn-warning">Kembali</a>
+                <a href="{{ url('/retur_penjualan') }}" class="btn btn-warning">Kembali</a>
             </div>
         </div>
     </div>
 @else
-    <form action="{{ url('/barang/' . $barang->barang_id . '/update_ajax') }}" method="POST" id="form-edit">
+    <form action="{{ url('/retur_penjualan/' . $retur->retur_id . '/delete_ajax') }}" method="POST" id="form-delete-retur">
         @csrf
-        @method('PUT')
+        @method('DELETE')
         <div id="modal-master" class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Edit Data Barang</h5>
+                    <h5 class="modal-title">Hapus Retur Penjualan</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <div class="form-group">
-                        <label>Kode Barang</label>
-                        <input type="text" name="barang_kode" class="form-control" value="{{ $barang->kode_barang }}" required>
-                        <small id="error-barang_kode" class="error-text form-text text-danger"></small>
+                    <div class="alert alert-warning">
+                        <h5><i class="icon fas fa-exclamation-triangle"></i> Konfirmasi !!!</h5>
+                        Apakah Anda yakin ingin menghapus data retur penjualan berikut?
                     </div>
-                    <div class="form-group">
-                        <label>Nama Barang</label>
-                        <input type="text" name="barang_nama" class="form-control" value="{{ $barang->nama_barang }}" required>
-                        <small id="error-barang_nama" class="error-text form-text text-danger"></small>
-                    </div>
-                    <div class="form-group">
-                        <label>Harga Beli</label>
-                        <input type="number" name="harga_beli" class="form-control" value="{{ $barang->harga_beli }}" required>
-                        <small id="error-harga_beli" class="error-text form-text text-danger"></small>
-                    </div>
-                    <div class="form-group">
-                        <label>Harga Jual</label>
-                        <input type="number" name="harga_jual" class="form-control" value="{{ $barang->harga_jual }}" required>
-                        <small id="error-harga_jual" class="error-text form-text text-danger"></small>
-                    </div>
-                    <div class="form-group">
-                        <label>Kategori</label>
-                        <select name="kategori_id" class="form-control" required>
-                            <option value="">- Pilih Kategori -</option>
-                            @foreach($kategori as $k)
-                                <option value="{{ $k->kategori_id }}" {{ $barang->kategori_id == $k->kategori_id ? 'selected' : '' }}>
-                                    {{ $k->kategori_nama }}
-                                </option>
-                            @endforeach
-                        </select>
-                        <small id="error-kategori_id" class="error-text form-text text-danger"></small>
-                    </div>
+                    <table class="table table-sm table-bordered table-striped">
+                        <tr>
+                            <th class="text-right col-4">Kode Penjualan:</th>
+                            <td class="col-8">{{ $retur->penjualan->penjualan_kode ?? '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th class="text-right">Nama Barang:</th>
+                            <td>{{ $retur->barang->nama_barang ?? '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th class="text-right">Jumlah Retur:</th>
+                            <td>{{ $retur->jumlah }}</td>
+                        </tr>
+                        <tr>
+                            <th class="text-right">Alasan:</th>
+                            <td>{{ $retur->alasan }}</td>
+                        </tr>
+                        <tr>
+                            <th class="text-right">Tanggal Retur:</th>
+                            <td>{{ $retur->tanggal_retur }}</td>
+                        </tr>
+                    </table>
                 </div>
                 <div class="modal-footer">
                     <button type="button" data-dismiss="modal" class="btn btn-warning">Batal</button>
-                    <button type="submit" class="btn btn-primary">Simpan</button>
+                    <button type="submit" class="btn btn-danger">Ya, Hapus</button>
                 </div>
             </div>
         </div>
@@ -72,15 +66,8 @@
 
     <script>
         $(document).ready(function () {
-            $("#form-edit").validate({
-                rules: {
-                    barang_kode: { required: true, minlength: 3 },
-                    barang_nama: { required: true, minlength: 3 },
-                    harga_beli: { required: true, number: true, min: 1 },
-                    harga_jual: { required: true, number: true, min: 1 },
-                    kategori_id: { required: true },
-                },
-
+            $("#form-delete-retur").validate({
+                rules: {},
                 submitHandler: function (form) {
                     $.ajax({
                         url: form.action,
@@ -94,10 +81,10 @@
                                     title: 'Berhasil',
                                     text: response.message
                                 });
-                                dataBarang.ajax.reload();
+                                tableReturPenjualan.ajax.reload(); // Ganti dengan ID datatable retur kamu
                             } else {
                                 $('.error-text').text('');
-                                $.each(response.msgField, function (prefix, val) {
+                                $.each(response.msgField ?? {}, function (prefix, val) {
                                     $('#error-' + prefix).text(val[0]);
                                 });
                                 Swal.fire({
@@ -106,21 +93,25 @@
                                     text: response.message
                                 });
                             }
+                        },
+                        error: function (xhr) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Server Error',
+                                text: 'Terjadi kesalahan pada server'
+                            });
                         }
                     });
                     return false;
                 },
-
                 errorElement: 'span',
                 errorPlacement: function (error, element) {
                     error.addClass('invalid-feedback');
                     element.closest('.form-group').append(error);
                 },
-
                 highlight: function (element) {
                     $(element).addClass('is-invalid');
                 },
-
                 unhighlight: function (element) {
                     $(element).removeClass('is-invalid');
                 }

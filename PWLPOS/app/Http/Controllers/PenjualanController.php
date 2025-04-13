@@ -226,32 +226,87 @@ class PenjualanController extends Controller
     
     public function import()
     {
-        return view('penjualan.import'); // Pastikan view sesuai
+        return view('penjualan.import');
     }
+    
     
     public function import_ajax(Request $request)
     {
-        $request->validate([
-            'file_penjualan' => 'required|file|mimes:xls,xlsx'
-        ]);
+        if ($request->ajax() || $request->wantsJson()) {
+            $rules = [
+                'file_penjualan' => ['required', 'mimes:xlsx', 'max:1024'] // Validasi file
+            ];
     
-        try {
-            Excel::import(new PenjualanImport, $request->file('file_penjualan'));
+            $validator = Validator::make($request->all(), $rules);
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Validasi Gagal',
+                    'msgField' => $validator->errors()
+                ]);
+            }
     
-            return response()->json([
-                'status' => true,
-                'message' => 'Data penjualan berhasil diimpor.'
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Gagal mengimpor data.',
-                'msgField' => [
-                    'file_penjualan' => [$e->getMessage()]
-                ]
-            ]);
+            $file = $request->file('file_penjualan');
+    
+            try {
+                $reader = IOFactory::createReader('Xlsx');
+                $reader->setReadDataOnly(true);
+                $spreadsheet = $reader->load($file->getRealPath());
+                $sheet = $spreadsheet->getActiveSheet();
+                $data = $sheet->toArray(null, false, true, true); // Mengambil data Excel
+    
+                $insert = [];
+                if (count($data) > 1) {
+                    foreach ($data as $row => $value) {
+                        if ($row > 1) {
+                            // Ambil dan validasi tanggal
+                            $tanggal = $value['D'];
+                            if (!empty($tanggal)) {
+                                if (is_numeric($tanggal)) {
+                                    $tanggal = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($tanggal)->format('Y-m-d H:i:s');
+                                } else {
+                                    $tanggal = date('Y-m-d H:i:s', strtotime($tanggal));
+                                }
+                            } else {
+                                $tanggal = now();
+                            }
+    
+                            $insert[] = [
+                                'user_id'            => (int) $value['A'], // Pastikan integer
+                                'pembeli'            => $value['B'],
+                                'penjualan_kode'     => $value['C'],
+                                'penjualan_tanggal'  => $tanggal,
+                                'created_at'         => now(),
+                                'updated_at'         => now(),
+                            ];
+                        }
+                    }
+    
+                    if (count($insert) > 0) {
+                        PenjualanModel::insertOrIgnore($insert);
+                    }
+    
+                    return response()->json([
+                        'status' => true,
+                        'message' => 'Data penjualan berhasil diimport'
+                    ]);
+                } else {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Tidak ada data yang diimport'
+                    ]);
+                }
+    
+            } catch (\Exception $e) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Terjadi kesalahan saat memproses file: ' . $e->getMessage()
+                ]);
+            }
         }
-    }
+    
+        return redirect('/');
+    }    
     
     public function export_excel()
     {

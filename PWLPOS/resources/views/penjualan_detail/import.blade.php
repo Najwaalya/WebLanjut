@@ -1,9 +1,9 @@
-<form action="{{ url('/penjualan/import_ajax') }}" method="POST" id="form-import-penjualan" enctype="multipart/form-data">
+<form action="{{ url('/penjualan_detail/import_ajax') }}" method="POST" id="form-import-detail" enctype="multipart/form-data">
     @csrf
-    <div id="modal-penjualan" class="modal-dialog modal-md" role="document">
+    <div id="modal-detail" class="modal-dialog modal-md" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Import Data Penjualan</h5>
+                <h5 class="modal-title">Import Data Detail Penjualan</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -11,15 +11,15 @@
             <div class="modal-body">
                 <div class="form-group">
                     <label>Download Template</label>
-                    <a href="{{ asset('template_penjualan.xlsx') }}" class="btn btn-info btn-sm" download>
+                    <a href="{{ asset('template_detail_penjualan.xlsx') }}" class="btn btn-info btn-sm" download>
                         <i class="fa fa-file-excel"></i> Download Template
                     </a>
                     <small id="error-template" class="error-text form-text text-danger"></small>
                 </div>
                 <div class="form-group">
                     <label>Pilih File Excel</label>
-                    <input type="file" name="file_penjualan" id="file_penjualan" class="form-control" required>
-                    <small id="error-file_penjualan" class="error-text form-text text-danger"></small>
+                    <input type="file" name="file_detail" id="file_detail" class="form-control" required>
+                    <small id="error-file_detail" class="error-text form-text text-danger"></small>
                 </div>
             </div>
             <div class="modal-footer">
@@ -32,9 +32,9 @@
 
 <script>
     $(document).ready(function () {
-        $("#form-import-penjualan").validate({
+        $("#form-import-detail").validate({
             rules: {
-                file_penjualan: { required: true, extension: "xlsx" },
+                file_detail: { required: true, extension: "xlsx" },
             },
             submitHandler: function (form) {
                 let formData = new FormData(form);
@@ -46,13 +46,13 @@
                     contentType: false,
                     success: function (response) {
                         if (response.status) {
-                            $('#modal-penjualan').modal('hide');
+                            $('#modal-detail').modal('hide');
                             Swal.fire({
                                 icon: 'success',
                                 title: 'Berhasil',
                                 text: response.message
                             });
-                            dataPenjualan.ajax.reload(); // reload datatable penjualan
+                            dataDetailPenjualan.ajax.reload(); // reload datatable detail penjualan
                         } else {
                             $('.error-text').text('');
                             if (response.msgField) {

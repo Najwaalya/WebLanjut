@@ -5,12 +5,18 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class DetailPenjualanModel extends Model
+class ReturPenjualanModel extends Model
 {
-    protected $table = 't_penjualan_detail';
-    protected $primaryKey = 'detail_id';
+    use HasFactory;
+
+    protected $table = 'retur_penjualan';
+    protected $primaryKey = 'retur_id';
     protected $fillable = [
-        'penjualan_id', 'barang_id', 'harga', 'jumlah'
+        'penjualan_id',
+        'barang_id',
+        'jumlah',
+        'alasan',
+        'tanggal_retur'
     ];
 
     public function penjualan()

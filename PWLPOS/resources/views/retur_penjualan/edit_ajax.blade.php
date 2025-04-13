@@ -1,4 +1,4 @@
-@empty($barang)
+@empty($retur)
     <div id="modal-master" class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -12,54 +12,61 @@
                     <h5><i class="icon fas fa-ban"></i> Kesalahan!!!</h5>
                     Data yang anda cari tidak ditemukan
                 </div>
-                <a href="{{ url('/barang') }}" class="btn btn-warning">Kembali</a>
+                <a href="{{ url('/retur_penjualan') }}" class="btn btn-warning">Kembali</a>
             </div>
         </div>
     </div>
 @else
-    <form action="{{ url('/barang/' . $barang->barang_id . '/update_ajax') }}" method="POST" id="form-edit">
+    <form action="{{ url('/retur_penjualan/' . $retur->retur_id . '/update_ajax') }}" method="POST" id="form-edit">
         @csrf
         @method('PUT')
         <div id="modal-master" class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Edit Data Barang</h5>
+                    <h5 class="modal-title">Edit Retur Penjualan</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
-                        <label>Kode Barang</label>
-                        <input type="text" name="barang_kode" class="form-control" value="{{ $barang->kode_barang }}" required>
-                        <small id="error-barang_kode" class="error-text form-text text-danger"></small>
+                        <label>Tanggal Retur</label>
+                        <input type="date" name="tanggal_retur" class="form-control" value="{{ $retur->tanggal_retur }}" required>
+                        <small id="error-tanggal_retur" class="error-text form-text text-danger"></small>
                     </div>
                     <div class="form-group">
-                        <label>Nama Barang</label>
-                        <input type="text" name="barang_nama" class="form-control" value="{{ $barang->nama_barang }}" required>
-                        <small id="error-barang_nama" class="error-text form-text text-danger"></small>
-                    </div>
-                    <div class="form-group">
-                        <label>Harga Beli</label>
-                        <input type="number" name="harga_beli" class="form-control" value="{{ $barang->harga_beli }}" required>
-                        <small id="error-harga_beli" class="error-text form-text text-danger"></small>
-                    </div>
-                    <div class="form-group">
-                        <label>Harga Jual</label>
-                        <input type="number" name="harga_jual" class="form-control" value="{{ $barang->harga_jual }}" required>
-                        <small id="error-harga_jual" class="error-text form-text text-danger"></small>
-                    </div>
-                    <div class="form-group">
-                        <label>Kategori</label>
-                        <select name="kategori_id" class="form-control" required>
-                            <option value="">- Pilih Kategori -</option>
-                            @foreach($kategori as $k)
-                                <option value="{{ $k->kategori_id }}" {{ $barang->kategori_id == $k->kategori_id ? 'selected' : '' }}>
-                                    {{ $k->kategori_nama }}
+                        <label>Penjualan</label>
+                        <select name="penjualan_id" class="form-control" required>
+                            <option value="">- Pilih Penjualan -</option>
+                            @foreach($penjualan as $p)
+                                <option value="{{ $p->penjualan_id }}" {{ $retur->penjualan_id == $p->penjualan_id ? 'selected' : '' }}>
+                                    {{ $p->penjualan_kode }}
                                 </option>
                             @endforeach
                         </select>
-                        <small id="error-kategori_id" class="error-text form-text text-danger"></small>
+                        <small id="error-penjualan_id" class="error-text form-text text-danger"></small>
+                    </div>
+                    <div class="form-group">
+                        <label>Barang</label>
+                        <select name="barang_id" class="form-control" required>
+                            <option value="">- Pilih Barang -</option>
+                            @foreach($barang as $b)
+                                <option value="{{ $b->barang_id }}" {{ $retur->barang_id == $b->barang_id ? 'selected' : '' }}>
+                                    {{ $b->nama_barang }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <small id="error-barang_id" class="error-text form-text text-danger"></small>
+                    </div>
+                    <div class="form-group">
+                        <label>Jumlah</label>
+                        <input type="number" name="jumlah" class="form-control" value="{{ $retur->jumlah }}" required min="1">
+                        <small id="error-jumlah" class="error-text form-text text-danger"></small>
+                    </div>
+                    <div class="form-group">
+                        <label>Alasan Retur</label>
+                        <input type="text" name="alasan" class="form-control" value="{{ $retur->alasan }}" required>
+                        <small id="error-alasan" class="error-text form-text text-danger"></small>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -74,13 +81,12 @@
         $(document).ready(function () {
             $("#form-edit").validate({
                 rules: {
-                    barang_kode: { required: true, minlength: 3 },
-                    barang_nama: { required: true, minlength: 3 },
-                    harga_beli: { required: true, number: true, min: 1 },
-                    harga_jual: { required: true, number: true, min: 1 },
-                    kategori_id: { required: true },
+                    tanggal_retur: { required: true, date: true },
+                    penjualan_id: { required: true },
+                    barang_id: { required: true },
+                    jumlah: { required: true, number: true, min: 1 },
+                    alasan: { required: true, minlength: 3 }
                 },
-
                 submitHandler: function (form) {
                     $.ajax({
                         url: form.action,
@@ -88,16 +94,16 @@
                         data: $(form).serialize(),
                         success: function (response) {
                             if (response.status) {
-                                $('#myModal').modal('hide');
+                                $('#modal-master').modal('hide');
                                 Swal.fire({
                                     icon: 'success',
                                     title: 'Berhasil',
                                     text: response.message
                                 });
-                                dataBarang.ajax.reload();
+                                dataReturPenjualan.ajax.reload(); // Ganti sesuai nama variabel datatable kamu
                             } else {
                                 $('.error-text').text('');
-                                $.each(response.msgField, function (prefix, val) {
+                                $.each(response.msgField ?? {}, function (prefix, val) {
                                     $('#error-' + prefix).text(val[0]);
                                 });
                                 Swal.fire({
@@ -106,21 +112,25 @@
                                     text: response.message
                                 });
                             }
+                        },
+                        error: function () {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Server Error',
+                                text: 'Terjadi kesalahan saat menghubungi server.'
+                            });
                         }
                     });
                     return false;
                 },
-
                 errorElement: 'span',
                 errorPlacement: function (error, element) {
                     error.addClass('invalid-feedback');
                     element.closest('.form-group').append(error);
                 },
-
                 highlight: function (element) {
                     $(element).addClass('is-invalid');
                 },
-
                 unhighlight: function (element) {
                     $(element).removeClass('is-invalid');
                 }

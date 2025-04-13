@@ -68,6 +68,18 @@
                     <p>Transaksi Penjualan</p>
                 </a>
             </li>
+            <li class="nav-item">
+                <a href="{{ url('/penjualan_detail') }}" class="nav-link {{ $activeMenu == 'penjualan_detail' ? 'active' : '' }}">
+                    <i class="nav-icon fas fa-list"></i>
+                    <p>Detail Penjualan</p>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ url('/retur_penjualan') }}" class="nav-link {{ $activeMenu == 'retur_penjualan' ? 'active' : '' }}">
+                    <i class="nav-icon fas fa-undo-alt"></i>
+                    <p>Retur Penjualan</p>
+                </a>
+            </li>
         </ul>
     </nav>
 </div>
