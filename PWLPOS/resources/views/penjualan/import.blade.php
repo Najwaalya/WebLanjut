@@ -1,26 +1,22 @@
-<form action="{{ url('/penjualan/import_ajax') }}" method="POST" id="form-import-penjualan" enctype="multipart/form-data">
+<form action="{{ url('/penjualan/import_ajax') }}" method="POST" id="form-import" enctype="multipart/form-data">
     @csrf
-    <div id="modal-penjualan" class="modal-dialog modal-md" role="document">
+    <div id="modal-master" class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Import Data Penjualan</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <h5 class="modal-title" id="exampleModalLabel">Import Data penjualan</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
             </div>
             <div class="modal-body">
                 <div class="form-group">
                     <label>Download Template</label>
-                    <a href="{{ asset('template_penjualan.xlsx') }}" class="btn btn-info btn-sm" download>
-                        <i class="fa fa-file-excel"></i> Download Template
-                    </a>
-                    <small id="error-template" class="error-text form-text text-danger"></small>
+                    <a href="{{ asset('template_penjualan.xlsx') }}" class="btn btn-info btn-sm" download><i class="fa fa-file-excel"></i>Download</a>
+                    <small id="error-penjualan_id" class="error-text form-text text-danger"></small>
                 </div>
                 <div class="form-group">
-                    <label>Pilih File Excel</label>
+                    <label>Pilih File</label>
                     <input type="file" name="file_penjualan" id="file_penjualan" class="form-control" required>
                     <small id="error-file_penjualan" class="error-text form-text text-danger"></small>
-                </div>
+                </div> 
             </div>
             <div class="modal-footer">
                 <button type="button" data-dismiss="modal" class="btn btn-warning">Batal</button>
@@ -29,50 +25,40 @@
         </div>
     </div>
 </form>
-
 <script>
-    $(document).ready(function () {
-        $("#form-import-penjualan").validate({
+    $(document).ready(function() {
+        $("#form-import").validate({
             rules: {
-                file_penjualan: { required: true, extension: "xlsx" },
+                file_penjualan: {required: true, extension: "xlsx"},
             },
-            submitHandler: function (form) {
-                let formData = new FormData(form);
+            submitHandler: function(form) {
+                var formData = new FormData(form); // Jadikan form ke FormData untuk menghandle file
                 $.ajax({
                     url: form.action,
                     type: form.method,
-                    data: formData,
-                    processData: false,
+                    data: formData, // Data yang dikirim berupa FormData
+                    processData: false, // setting processData dan contentType ke false, untuk menghandle file
                     contentType: false,
-                    success: function (response) {
-                        if (response.status) {
-                            $('#modal-penjualan').modal('hide');
+                    success: function(response) {
+                        if(response.status){ // jika sukses
+                            $('#myModal').modal('hide');
                             Swal.fire({
                                 icon: 'success',
                                 title: 'Berhasil',
                                 text: response.message
                             });
-                            dataPenjualan.ajax.reload(); // reload datatable penjualan
-                        } else {
+                            dataPenjualan.ajax.reload(); // reload datatable
+                        }else{ // jika error
                             $('.error-text').text('');
-                            if (response.msgField) {
-                                $.each(response.msgField, function (prefix, val) {
-                                    $('#error-' + prefix).text(val[0]);
-                                });
-                            }
+                            $.each(response.msgField, function(prefix, val) {
+                                $('#error-'+prefix).text(val[0]);
+                            });
                             Swal.fire({
                                 icon: 'error',
-                                title: 'Gagal',
+                                title: 'Terjadi Kesalahan',
                                 text: response.message
                             });
                         }
-                    },
-                    error: function () {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: 'Gagal mengirim permintaan ke server.'
-                        });
                     }
                 });
                 return false;
@@ -82,11 +68,11 @@
                 error.addClass('invalid-feedback');
                 element.closest('.form-group').append(error);
             },
-            highlight: function (element) {
+            highlight: function (element, errorClass, validClass) {
                 $(element).addClass('is-invalid');
             },
-            unhighlight: function (element) {
-                $(element).removeClass('is-invalid');
+            unhighlight: function (element, errorClass, validClass) {
+            $(element).removeClass('is-invalid');
             }
         });
     });

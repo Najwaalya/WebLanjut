@@ -203,22 +203,6 @@ use App\Http\Controllers\DetailPenjualanController;
         Route::get('/export_pdf', [PenjualanController::class, 'export_pdf']); // menampilkan halaman form export pdf penjualan
     });
 
-    Route::group(['prefix' => 'penjualan_detail', 'middleware' => ['authorize:ADM,MNG,STF']], function () {
-        Route::get('/', [DetailPenjualanController::class, 'index']); // Halaman awal detail penjualan
-        Route::post('/list', [DetailPenjualanController::class, 'list']); // Menampilkan data detail penjualan untuk datatables
-        Route::get('/create_ajax', [DetailPenjualanController::class, 'create_ajax']); // menampilkan halaman form tambah Detail Penjualan ajax
-        Route::post('/ajax', [DetailPenjualanController::class, 'store_ajax']); // menyimpan data detail penjualan baru ajax
-        Route::get('/{id}/show_ajax', [DetailPenjualanController::class,'show_ajax']); // menampilkan detail dari detail penjualan ajax
-        Route::get('/{id}/edit_ajax', [DetailPenjualanController::class, 'edit_ajax']); // menampilkan halaman form edit detail penjualan ajax
-        Route::put('/{id}/update_ajax', [DetailPenjualanController::class, 'update_ajax']); // menyimpan perubahan data penjualan ajax
-        Route::get('/{id}/delete_ajax', [DetailPenjualanController::class, 'confirm_ajax']); // menampilkan form konfirmasi delete penjualan ajax
-        Route::delete('/{id}/delete_ajax', [DetailPenjualanController::class, 'delete_ajax']); // menghapus data penjualan ajax
-        Route::get('/import', [DetailPenjualanController::class, 'import']); // menampilkan halaman form upload excel detail penjualan ajax
-        Route::post('/import_ajax', [DetailPenjualanController::class, 'import_ajax']); // menyimpan import excel detail penjualan ajax
-        Route::get('/export_excel', [DetailPenjualanController::class, 'export_excel']); // menampilkan halaman form export excel penjualan ajax
-        Route::get('/export_pdf', [DetailPenjualanController::class, 'export_pdf']); // menampilkan halaman form export pdf penjualan
-    });    
-
     Route::group(['prefix' => 'retur_penjualan'], function () {
         Route::middleware(['authorize:ADM'])->group(function () {
             Route::get('/', [ReturPenjualanController::class, 'index']); 
