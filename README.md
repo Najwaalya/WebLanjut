@@ -1,4 +1,4 @@
-# 📌 Tugas Semester 6 & Website POS Laravel
+# 📌 Tugas Semester 4 & Website POS Laravel
 
 Repository ini berisi kumpulan tugas Semester 4 serta proyek pengembangan website Point of Sales (POS) menggunakan Laravel.
 
